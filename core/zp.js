@@ -1,6 +1,4 @@
-
 ;(function () {
-
 
 	"use strict";
 	
@@ -69,6 +67,14 @@
 		**/
 		isArray : function (item) {
 			return Array.isArray(item);
+		},
+		/**
+		* Проверяет является ли item undefined
+		*@param mixed item
+		*@return Boolean 
+		**/
+		isUndefined : function (item) {
+			return typeof item === 'undefined';
 		},
 		
 		/**
