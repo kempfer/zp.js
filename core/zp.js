@@ -20,7 +20,7 @@
          * @param {Function|String|Object|Number|Boolean} item
          * @returns {boolean}
          */
-		isFunction : function  (item) {
+		isFunction : function coreIsFunction  (item) {
 			return typeof item === "function" ;
 		},
 
@@ -29,7 +29,7 @@
          * @param {Function|String|Object|Number|Boolean} item
          * @returns {boolean}
          */
-		isObject : function (item) {
+		isObject : function coreIsObject (item) {
 			return Object.prototype.toString.call(item) === '[object Object]';
 		},
 		
@@ -38,7 +38,7 @@
 		*@param {Function|String|Object|Number|Boolean}  item
 		*@returns {Boolean}
 		**/
-		isString : function (item) {
+		isString : function coreIsString (item) {
 			return typeof item === "string";
 		},
 		
@@ -47,7 +47,7 @@
 		*@param {Function|String|Object|Number|Boolean}  item
 		*@returns {Boolean}
 		**/
-		isBoolean : function (item) {
+		isBoolean : function coreIsBoolean(item) {
 			return typeof item === "boolean";
 		},
 		
@@ -56,7 +56,7 @@
 		*@param {Function|String|Object|Number|Boolean}  item
 		*@returns {Boolean}
 		**/
-		isNumber : function (item) {
+		isNumber : function coreIsNumber (item) {
 			return typeof item === "number" && isFinite(item);
 		},
 		
@@ -65,7 +65,7 @@
 		*@param {Function|String|Object|Number|Boolean}  item
 		*@returns {Boolean}
 		**/
-		isArray : function (item) {
+		isArray : function coreIsArray (item) {
 			return Array.isArray(item);
 		},
 		
@@ -74,7 +74,7 @@
 		*@param {Function|String|Object|Number|Boolean}  item
 		*@return {Boolean}
 		**/
-		isUndefined : function (item) {
+		isUndefined : function coreIsUndefined (item) {
 			return typeof item === 'undefined';
 		},
 
@@ -94,7 +94,7 @@
 		* @param string name
 		* @param {Object|Function} item
 		**/
-		expand : function (name, item) {
+		expand : function coreExpand (name, item) {
 			if(zp.isEmpty(zp[name])){
 				zp[name] = item;
 			}
@@ -105,7 +105,7 @@
 		*@param mixed item
 		*@returns {Boolean}
 		**/
-		isEmpty : function (item) {
+		isEmpty : function coreIsEmpty (item) {
 			return 	(item === false ) 									||
 					(item === 0) 										||
 					(item === null)										||
@@ -120,7 +120,7 @@
          * @param Object options
          * @returns {Object}
          */
-		merger : function (obj,options) {
+		merger : function coreMerger (obj,options) {
 			var 
 				i, key,
 				newObj = {};
@@ -137,7 +137,7 @@
          * @param data
          * @returns {*}
          */
-        encode : function (data) {
+        encode : function coreJsonEncode (data) {
             try{
                 return JSON.stringify(data);
             }
@@ -151,7 +151,7 @@
          * @param data
          * @returns {*}
          */
-        decode : function (data) {
+        decode : function coreJsonDecode (data) {
             try{
                 return JSON.parse(data);
             }
