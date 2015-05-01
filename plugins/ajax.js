@@ -8,7 +8,7 @@
     var
         /**
          *
-         * @param object
+         * @param object|string|number
          * @returns {string}
          */
         stringify = function ajaxStringify (object) {
@@ -19,10 +19,8 @@
             if (zp.isEmpty(object)){
                 return '';  
             } 
-            if(!zp.isUndefined(window.FormData)){
-                if(object instanceof window.FormData) {
-                    return object;   
-                }
+            if(!zp.isUndefined(window.FormData) && object instanceof window.FormData){
+                return object;
             }
             if (zp.isString(object) || zp.isNumber(object)) {
                 return String( object );  
@@ -71,8 +69,24 @@
 
         /**
          *
-         * @param xhr
-         * @param config
+         * @param XMLHttpRequest  xhr
+         * @param Object headers
+         * @param boolean sendFormData
+         */
+        setHeaders =  function ajaxSetHeaders (xhr,headers,isSendFormData) {
+            for(var key in headers){
+                if(isSendFormData && key == 'Content-Type'){
+                    continue;
+                }
+                xhr.setRequestHeader(key,headers[key]);
+            }
+            xhr.setRequestHeader('X-Requested-With','XMLHttpRequest');
+        },
+
+        /**
+         *
+         * @param XMLHttpRequest xhr
+         * @param  config
          * @returns {Function}
          */
         onReady =  function ajaxOnReady (xhr, config) {      
@@ -80,14 +94,19 @@
                 if (xhr.readyState == 4) {              
                     if (xhr.status == 200) {
                         var result = xhr.responseText;
-                        if(config.type.toUpperCase() == 'JSON'){
+                        if(config.responseType.toUpperCase() == 'JSON'){
                             result = zp.decode(result);
-                        }   
-                        config.onLoad(result);
+                        }
+                        if(zp.isFunction(config.onLoad)){
+                            config.onLoad(result,xhr,e);
+                        }
                     }
                     else{       
-                        var result = xhr.responseText;                  
-                        config.onError(xhr.status,result);
+                        var result = xhr.responseText;
+                        if(zp.isFunction(config.onError)){
+                            config.onError(result,xhr,e);
+                        }
+
                     }               
                 }
             }
@@ -105,28 +124,27 @@
             var 
                 readyConfig = prepareConfig(config),
                 method = readyConfig.method.toUpperCase(),
-                data = stringify(readyConfig.data),
-                url = prepareUrl(readyConfig.url,method,data,readyConfig.cache);
+                sendData = stringify(readyConfig.data),
+                url = prepareUrl(readyConfig.url,method,sendData,readyConfig.cache),
+                isSendFormData = !zp.isUndefined(window.FormData) && sendData instanceof window.FormData;
+            this.id = zp.uniqueId();
             this.xhr = new XMLHttpRequest();
-            this.xhr.open(method, url);
+            this.xhr.open(method, url, readyConfig.async);
             this.xhr.timeout = readyConfig.timeout;
             this.xhr.onreadystatechange = onReady(this.xhr, readyConfig);
-            this.xhr.onabort = readyConfig.onAbort;
-            this.xhr.send( method == 'POST' && data ? data : null );
+            this.xhr.onabort = zp.isFunction(readyConfig.onAbort) ? readyConfig.onAbort : null;
+            setHeaders(this.xhr, readyConfig.headers, isSendFormData);
+            this.xhr.send( method == 'POST' && sendData ? sendData : null );
             return this;
         };
 
     ajax.prototype = {
 
-        /**
-         *
-         */
         constructor : ajax,
 
-        /**
-         *
-         */
         xhr : null,
+
+        id : null,
 
         /**
          *
@@ -137,17 +155,22 @@
             return this;
         }
     };
+
     /**
      *
-     * @type {{method: string, type: string, timeout: number, data: {}, cache: boolean, url: string, onAbort: function, onLoad: function, onError: function}}
+     * @type {{method: string, type: string, timeout: number, data: {}, cache: boolean, url: string, headers: {X-Requested-With: string}, onAbort: zp.emptyFunc, onLoad: zp.emptyFunc, onError: zp.emptyFunc}}
      */
     ajax.defaultConfig = {
         method : 'GET',
-        type : '',
+        responseType : '',
         timeout : 30000,
         data : {},
-        cache : false,
+        cache : true,
+        async	: true,
         url : location.href,
+        headers : {
+            'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
+        },
         onAbort : zp.emptyFunc,
         onLoad : zp.emptyFunc,
         onError : zp.emptyFunc

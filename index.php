@@ -6,8 +6,13 @@
  * Time: 15:47
  */
 
-sleep(10);
 
+
+echo 'GET ';
 print_R($_GET);
 
+echo 'REQUEST ';
 print_r($_REQUEST);
+
+echo 'POST ';
+print_R($_POST);

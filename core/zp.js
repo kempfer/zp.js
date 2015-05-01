@@ -135,7 +135,7 @@
         /**
          *
          * @param data
-         * @returns {*}
+         * @returns {String|Boolean}
          */
         encode : function coreJsonEncode (data) {
             try{
@@ -149,7 +149,7 @@
         /**
          *
          * @param data
-         * @returns {*}
+         * @returns {Object|Boolean}
          */
         decode : function coreJsonDecode (data) {
             try{
