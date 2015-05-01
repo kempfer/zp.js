@@ -77,18 +77,16 @@
 		isUndefined : function (item) {
 			return typeof item === 'undefined';
 		},
-		
 
 		/**
          * Ссылка на пустую функию
          *		 
 		 */
 		emptyFunc : function () {},
-		
-		/**
-		*
-		*@return {Object}
-		**/
+
+        /**
+         * Object
+         */
 		globalScope : (typeof window === 'undefined') ? this : window,
 		
 		/**
@@ -115,9 +113,53 @@
 					(zp.isArray(item) && item.length === 0) 			||
 					(item === "" )										||
 					(zp.isObject(item) && Object.keys(item).length === 0);
-		}
+		},
+        /**
+         *
+         * @param Object obj
+         * @param Object options
+         * @returns {Object}
+         */
+		merger : function (obj,options) {
+			var 
+				i, key,
+				newObj = {};
+			for( i in obj){
+				newObj[i] = obj[i];
+			}
+			for( key in options){
+				newObj[key] = options[key];
+			}
+			return newObj;
+		},
+        /**
+         *
+         * @param data
+         * @returns {*}
+         */
+        encode : function (data) {
+            try{
+                return JSON.stringify(data);
+            }
+            catch(e){
+                return false;
+            }
+        },
+
+        /**
+         *
+         * @param data
+         * @returns {*}
+         */
+        decode : function (data) {
+            try{
+                return JSON.parse(data);
+            }
+            catch(e){
+                return false;
+            }
+        }
 	};
-	
 	zp.globalScope['zp'] = zp;
 
 })();

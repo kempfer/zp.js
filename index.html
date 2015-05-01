@@ -4,9 +4,24 @@
 		<meta charset="utf-8">
 		<title>Teq Local Cloud</title>
 		<script type="text/javascript"  src="core/zp.js"></script>		
+		<script type="text/javascript"  src="plugins/ajax.js"></script>	
 	<body>
 		<script>
 		console.log(zp);
+        var ajaxMy = zp.ajax({
+            url : 'index.php',
+            data : {
+                    test: 22
+            },
+            onLoad : function (e) {
+                console.log(e);
+            },
+            onAbort : function (e) {
+                console.log('onAbort');
+            }
+        });
+
+        ajaxMy.abort();
 		</script>
 	</body>
 </html>
