@@ -68,27 +68,32 @@ asyncTest('POST', function(){
 
 });
 
-asyncTest('from Data', function(){
+if(!zp.isUndefined(window.FormData)){
+    asyncTest('from Data', function(){
 
-    expect(1);
-    var form =  document.createElement('form');
-    form.setAttribute('id','test-form');
-    var input = document.createElement('input');
-    input.setAttribute('type','hidden');
-    input.setAttribute('name','test');
-    input.value = '5';
-    form.appendChild(input);
-    document.body.appendChild(form);
+        expect(1);
+
+        var form =  document.createElement('form');
+        form.setAttribute('id','test-form');
+        var input = document.createElement('input');
+        input.setAttribute('type','hidden');
+        input.setAttribute('name','test');
+        input.value = '5';
+        form.appendChild(input);
+        document.body.appendChild(form);
 
 
-    zp.ajax({
-        url: '/index.php',
-        method: 'POST',
-        data: new FormData( document.getElementById('test-form')),
-        onLoad: function (response) {
-            equal(response, 'ok', 'Send POST Form Data "/index.php"');
-            start();
-        }
+        zp.ajax({
+            url: '/index.php',
+            method: 'POST',
+            data: new FormData( document.getElementById('test-form')),
+            onLoad: function (response) {
+                equal(response, 'ok', 'Send POST Form Data "/index.php"');
+                start();
+            }
+        });
+
     });
+}
 
-});
+
