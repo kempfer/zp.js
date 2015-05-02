@@ -8,11 +8,29 @@
 
 
 
-echo 'GET ';
-print_R($_GET);
+if(isset($_GET['test']) && $_GET['test'] == 1){
+    echo 'ok';
+    exit;
+}
 
-echo 'REQUEST ';
-print_r($_REQUEST);
 
-echo 'POST ';
-print_R($_POST);
+if(isset($_GET['test']) && $_GET['test'] == 2){
+    echo json_encode(['test' => 'ok']);
+    exit;
+}
+
+if(isset($_POST['test']) && $_POST['test'] == 3){
+    echo 'ok';
+    exit;
+}
+
+if(isset($_POST['test']) && $_POST['test'] == 4){
+    echo json_encode(['test' => 'ok']);
+    exit;
+}
+
+
+if(isset($_POST['test']) && $_POST['test'] == 5){
+    echo 'ok';
+    exit;
+}
