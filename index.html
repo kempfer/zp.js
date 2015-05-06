@@ -2,10 +2,11 @@
 <html>
 	<head>
 		<meta charset="utf-8">
-		<title>Teq Local Cloud</title>
-		<script type="text/javascript"  src="core/zp.js"></script>		
-		<script type="text/javascript"  src="plugins/ajax.js"></script>	
-	<body>
+		<title>Zp lib</title>
+		<script type="text/javascript"  src="core/zp.js"></script>
+        <script type="text/javascript"  src="plugins/ajax.js"></script>
+        <script type="text/javascript"  src="plugins/dom.js"></script>
+    <body>
         <form id="test-form">
             <input type="hidden" name="test" value="123">
         </form>
@@ -23,6 +24,11 @@
                 console.log('onAbort');
             }
         });
+        ;(function () {
+
+            "use strict";
+
+        })();
 
        //ajaxMy.abort();
 		</script>

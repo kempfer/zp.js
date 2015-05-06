@@ -94,7 +94,7 @@
 		* @param string name
 		* @param {Object|Function} item
 		**/
-		expand : function coreExpand (name, item) {
+        extend : function coreExpand (name, item) {
 			if(zp.isEmpty(zp[name])){
 				zp[name] = item;
 			}
@@ -135,28 +135,36 @@
         /**
          *
          * @param data
-         * @returns {String|Boolean}
+         * @param {Boolean} [safe=false]
+         * @returns {String}
          */
-        encode : function coreJsonEncode (data) {
+        encode : function coreJsonEncode (data, safe) {
             try{
                 return JSON.stringify(data);
             }
             catch(e){
-                return false;
+                if(safe === true){
+                    return null;
+                }
+                throw new Error(e);
             }
         },
 
         /**
          *
          * @param data
-         * @returns {Object|Boolean}
+         * @param {Boolean} [safe=false]
+         * @returns {Object}
          */
-        decode : function coreJsonDecode (data) {
+        decode : function coreJsonDecode (data,safe) {
             try{
                 return JSON.parse(data);
             }
             catch(e){
-                return false;
+                if(safe === true){
+                    return null;
+                }
+                throw new Error(e);
             }
         },
 
