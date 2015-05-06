@@ -202,6 +202,6 @@
     };
 
 
-    zp.expand('dom', dom);
+    zp.extend('dom', dom);
 
 })(zp,document) ;

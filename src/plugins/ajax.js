@@ -177,6 +177,6 @@
         onError : zp.emptyFunc
 
     };
-    zp.expand('ajax', ajax);
+    zp.extend('ajax', ajax);
 
 })(zp);
