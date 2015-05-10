@@ -333,6 +333,20 @@
         },
         /**
          *
+         * @returns {dom}
+         */
+        empty : function () {
+            this.each(function (node) {
+                if (node.removeChild) {
+                    while (node.hasChildNodes()) {
+                        node.removeChild(node.firstChild);
+                    }
+                }
+            });
+            return this;
+        },
+        /**
+         *
          * @param selector
          * @returns {dom}
          */
@@ -348,20 +362,47 @@
         },
         /**
          *
-         * @param string [key]
-         * @param {number|string} [val]
-         * @returns {string}
+         * @param node
+         * @returns {dom}
          */
-        css : function (key,val) {
-            if(arguments.length === 1){
-                if (dom.isElement(this.first)) {
-                    return window.getComputedStyle(this.first, "").getPropertyValue(hyphenate(key));
-                }
+        append : function (node) {
+            var el = (node instanceof dom) ? node : new dom(node),
+                first = this.first,
+                fr = document.createDocumentFragment();
+            if(first.appendChild){
+                el.each(function (node) {
+                    fr.appendChild(node);
+                });
+                first.appendChild(fr);
             }
-            else{
-
-            }
+            return this;
         },
+        /**
+         *
+         * @param string [key]
+         * @param {number|string} [value]
+         * @returns {dom}
+         */
+        css : zp.accessor({
+            get : function domGetCss (property) {
+                if (dom.isElement(this.first)) {
+                    return window.getComputedStyle(this.first, "").getPropertyValue(hyphenate(property));
+                }
+                return;
+            },
+            set : function domSetCss (property,value) {
+                if (zp.isNumber(value) && !ignoreCssPostfix[property]) {
+                    value += 'px';
+                }
+                this.each(function (node) {
+                    if(node.style){
+                        node.style[camelCase(property)] =  value;
+                    }
+                });
+                return this;
+            }
+        }),
+
 
         /**
          *
@@ -369,22 +410,21 @@
          * @param {string} [val]
          * @returns {string|dom}
          */
-        attr: function (key,val) {
-            var first = this.first;
-            if(arguments.length === 1 && !zp.isObject(key)){
-                if(first.getAttribute){
-                    return first.getAttribute(key);
+        attr: zp.accessor({
+            get : function domGetAttr (property) {
+                if(this.first.getAttribute){
+                    return this.first.getAttribute(property);
                 }
-            }
-            else{
+            },
+            set : function domSetAttr (property,value) {
                 this.each(function (node) {
                     if(node.setAttribute){
-                        node.setAttribute(key,val);
+                        node.setAttribute(property,value);
                     }
                 });
                 return this;
             }
-        },
+        }),
 
         /**
          *
@@ -473,7 +513,10 @@
         toArray: function () {
             return zp.toArray( this.nodes );
         }
-    }
+    };
+
+    // Static Methods
+
     /**
      *
      * @param {object} node
@@ -529,7 +572,7 @@
     /**
      *
      * @param {string} selector
-     * @param {Object} context
+     * @param {Object} [context]
      * @returns {boolean}
      */
     dom.is = function (selector,context) {

@@ -13,12 +13,13 @@
         <input type="text" name="test2" id="test-input" value="123">
 		<script>
             zp.dom.onReady(function () {
-                var formById = zp.dom('#test-form');
-                console.log(formById);
-                var formByTag = zp.dom('form');
-                console.log(formByTag);
-                var formByClass = zp.dom('.form');
-                console.log(formByClass);
+                var start = new Date().getTime();
+                var i;
+                for(i = 0; i < 1000000; i++){
+                    new zp.dom('.form');
+                }
+                console.log(new Date().getTime() - start);
+
             });
 		</script>
 	</body>

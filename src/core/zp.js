@@ -75,7 +75,7 @@
 		*@return {Boolean}
 		**/
 		isUndefined : function coreIsUndefined (item) {
-			return typeof item === 'undefined';
+			return typeof item === typeof undefined;
 		},
 
 		/**
@@ -175,6 +175,33 @@
          */
         toArray : function (item) {
             return Array.prototype.slice.call(item);
+        },
+
+        /**
+         *
+         * @param {Object} accessor
+         * @returns {Function}
+         */
+        accessor : function (accessor) {
+            return function (property, value) {
+                var key,
+                    object = property;
+                if (zp.isUndefined(value) && !zp.isObject(property)) {
+                    return accessor.get.call(this, property);
+                }
+                else {
+                    if (!zp.isObject(object)) {
+                        object = {};
+                        object[property] = value;
+                    }
+                    for (key in object) {
+                        if(object.hasOwnProperty(key)){
+                            accessor.set.call(this, key, object[key]);
+                        }
+                    }
+                    return this;
+                }
+            }
         }
 	};
 	zp.globalScope['zp'] = zp;
