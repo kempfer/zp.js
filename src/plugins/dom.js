@@ -10,13 +10,13 @@
     var
         ready = false,
 
-        onLoadList = [],
+        onReadyList = [],
 
-        regexpSelector = {
-            findTag  	: /^[-_a-z0-9]+$/i,
-            findClass	: /^\.[-_a-z0-9]+$/i,
-            findId   	: /^#[-_a-z0-9]+$/i
-        },
+        regexpFindTag  	= /^[-_a-z0-9]+$/i,
+
+        regexpFindClass	= /^\.[-_a-z0-9]+$/i,
+
+        regexpFindId   	= /^#[-_a-z0-9]+$/i,
 
 
         ignoreCssPostfix =  {
@@ -55,12 +55,12 @@
                 return;
             }
             ready = true;
-            for(var i = 0; i < onLoadList.length; i++){
-                if(zp.isFunction(onLoadList[i])){
-                    onLoadList[i]();
+            for(var i = 0; i < onReadyList.length; i++){
+                if(zp.isFunction(onReadyList[i])){
+                    onReadyList[i]();
                 }
             }
-            onLoadList = [];
+            onReadyList = [];
         },
         /**
          *
@@ -72,10 +72,37 @@
             if (step == null || step < 0){
                 step = 1;
             }
-            if (!node || step <= 0){
+            if (!node || step <= 0 || !node.parentNode){
                 return new dom(node);
             }
             return findParentByStep(node.parentNode, step-1);
+        },
+        /**
+         *
+         * @param {dom} dom
+         * @param {string} names
+         * @param {string} action
+         */
+        actionsClasses = function domActionsClasses(dom,names,action) {
+            var i,
+                classNames = (!zp.isArray(names)) ? [names] : names;
+            dom.each(function (node) {
+                for (i = 0;i < classNames.length; i++) {
+                    if (node.classList) {
+                        switch (action) {
+                            case 'add':
+                                node.classList.add(classNames[i]);
+                            break;
+                            case 'remove':
+                                node.classList.remove(classNames[i]);
+                            break;
+                            case 'toggle':
+                                node.classList.toggle(classNames[i]);
+                            break;
+                        }
+                    }
+                }
+            });
         };
 
 
@@ -94,10 +121,6 @@
     var dom = function domConstructor (selector,context) {
         if (! (this instanceof dom)) {
             return new dom(selector,context);
-        }
-
-        if(!selector){
-            return this;
         }
 
         if (!arguments.length) {
@@ -131,14 +154,23 @@
      */
     dom.prototype = {
 
+        /**
+         * @type {Function}
+         */
         constructor: dom,
 
+        /**
+         * @type {Number}
+         */
         length: 0,
 
+        /**
+         * @type {Function}
+         */
         splice: [].slice,
 
         /**
-         * @pr
+         * @type {Array}
          */
         nodes: [],
 
@@ -148,9 +180,291 @@
          * @returns {Object|null}
          */
         get: function (index) {
-            return document.body;
             return this.nodes[Number(index) || 0];
         },
+
+        /**
+         *
+         * @returns {Object|undefined}
+         */
+        get first () {
+            return this.nodes[0];
+        },
+        /**
+         *
+         * @returns {Object}
+         */
+        get size() {
+            var node, rect,
+                first = this.first;
+            if (!zp.dom.isElement(first)) {
+                return {width : 0, height : 0};
+            }
+            node = (first === document) ? document.body : first;
+            rect = node.getBoundingClientRect();
+            return {width : rect.width, height : rect.height};
+        },
+        /**
+         *
+         * @returns {Object}
+         */
+        get offset() {
+            if (!dom.isElement(this.first)) {
+                return { x: 0, y: 0};
+            }
+            var node = this.first;
+            if (node.offsetX != null) {
+                return { x: node.offsetX, y: node.offsetY };
+            }
+            try {
+                var box = node.getBoundingClientRect(),
+                    body    = document.body,
+                    docElem = document.documentElement,
+                    scrollLeft = window.pageXOffset || docElem.scrollLeft || body.scrollLeft,
+                    scrollTop  = window.pageYOffset || docElem.scrollTop  || body.scrollTop,
+                    clientLeft = docElem.clientLeft || body.clientLeft || 0,
+                    clientTop  = docElem.clientTop  || body.clientTop  || 0;
+
+                return {
+                    x: Math.round(box.left + scrollLeft - clientLeft),
+                    y: Math.round(box.top  + scrollTop  - clientTop )
+                };
+            }
+            catch(e){
+                return { x: 0, y: 0};
+            }
+        },
+
+        /**
+         *
+         * @param {number} step
+         * @returns {dom}
+         */
+        parent : function (step) {
+            return findParentByStep(this.first,step);
+        },
+
+        /**
+         *
+         * @param {Function} callback
+         */
+        each : function (callback) {
+            this.nodes.forEach(callback.bind(this));
+            return this;
+        },
+        /**
+         *
+         * @param {string} event
+         * @param {Function} callback
+         * @param {Boolean} [useCapture=false]
+         * @returns {dom}
+         */
+        on: function (event,callback,useCapture) {
+            var arrayEvents;
+            this.each(function (node) {
+                if(node.addEventListener){
+                    arrayEvents = event.split(" ");
+                    arrayEvents.forEach(function (currentEvent) {
+                        node.addEventListener(currentEvent, callback, useCapture);
+                    });
+                }
+            });
+            return this;
+        },
+        /**
+         *
+         * @param {string} event
+         * @param {Function} callback
+         * @param {Boolean} [useCapture=false]
+         * @returns {dom}
+         */
+        off: function (event,callback,useCapture) {
+            var arrayEvents;
+            this.each(function (node) {
+                if(node.removeEventListener){
+                    arrayEvents = event.split(" ");
+                    arrayEvents.forEach(function (currentEvent) {
+                        node.removeEventListener(currentEvent, callback, useCapture);
+                    });
+                }
+            });
+            return this;
+        },
+        /**
+         *
+         * @param {string} attrName
+         * @returns {dom}
+         */
+        reomveAttr : function (attrName) {
+            this.each(function (node) {
+                if(node.removeAttribute){
+                    node.removeAttribute(attrName);
+                }
+            });
+            return this;
+        },
+
+        /**
+         *
+         * @param [deep=true]
+         * @returns {dom}
+         */
+        clone : function (deep) {
+            var clones = [],
+                deep = zp.isUndefined(deep) ? true : false;
+            this.each(function (node) {
+                if (zp.dom.isElement(node)) {
+                    clones.push(node.cloneNode(deep));
+                }
+            });
+            return new dom(clones);
+        },
+        /**
+         *
+         * @returns {dom}
+         */
+        remove: function () {
+            this.each(function (node) {
+                if (node.parentNode) {
+                    node.parentNode.removeChild(node);
+                }
+            });
+            return this;
+        },
+        /**
+         *
+         * @param selector
+         * @returns {dom}
+         */
+        find : function (selector) {
+            var result = [],found;
+            this.each(function (node) {
+                found = dom.query(selector,node);
+                found.forEach(function (el) {
+                    result.push(el);
+                });
+            });
+            return new dom(result);
+        },
+        /**
+         *
+         * @param string [key]
+         * @param {number|string} [val]
+         * @returns {string}
+         */
+        css : function (key,val) {
+            if(arguments.length === 1){
+                if (dom.isElement(this.first)) {
+                    return window.getComputedStyle(this.first, "").getPropertyValue(hyphenate(key));
+                }
+            }
+            else{
+
+            }
+        },
+
+        /**
+         *
+         * @param {string} key
+         * @param {string} [val]
+         * @returns {string|dom}
+         */
+        attr: function (key,val) {
+            var first = this.first;
+            if(arguments.length === 1 && !zp.isObject(key)){
+                if(first.getAttribute){
+                    return first.getAttribute(key);
+                }
+            }
+            else{
+                this.each(function (node) {
+                    if(node.setAttribute){
+                        node.setAttribute(key,val);
+                    }
+                });
+                return this;
+            }
+        },
+
+        /**
+         *
+         * @param {string} val
+         * @returns {dom|string}
+         */
+        html : function (val) {
+            if(arguments.length > 0){
+                this.first.innerHTML = val;
+                return this;
+            }
+            else{
+                return this.first.innerHTML;
+            }
+        },
+
+        /**
+         *
+         * @param {string} text
+         * @returns {dom|string}
+         */
+        text : function (text) {
+            var property = document.body.innerText == null ? 'textContent' : 'innerText';
+            if(arguments.length > 0){
+                this.first[property] = text;
+                return this;
+            }
+            else{
+                return this.first[property];
+            }
+        },
+
+        /**
+         *
+         * @param [String|Array] className
+         * @returns {dom}
+         */
+        addClass: function (className) {
+            actionsClasses(this,className, 'add');
+            return this;
+        },
+        /**
+         *
+         * @param [String|Array] className
+         * @returns {dom}
+         */
+        removeClass: function (className) {
+            actionsClasses(this,className, 'remove');
+            return this;
+        },
+
+        /**
+         *
+         * @param {string} className
+         * @returns {boolean}
+         */
+        hasClass : function (className) {
+            var result = false;
+            this.each(function (node) {
+                if (node.classList) {
+                    result = node.classList.contains(className);
+                    if (result === true) {
+                        return;
+                    }
+                }
+            });
+            return result;
+        },
+
+        /**
+         *
+         * @param [String|Array] className
+         * @returns {dom}
+         */
+        toggleClass: function (className) {
+            actionsClasses(this,className, 'toggle');
+            return this;
+        },
+
+
 
         /**
          *
@@ -174,7 +488,7 @@
      * @param {Function} callback
      * @throws {TypeError} callback is function
      */
-    dom.onLoad = function domOnReady (callback) {
+    dom.onReady = function domOnReady (callback) {
         if(!zp.isFunction(callback)){
             throw new TypeError("callback is not a function");
         }
@@ -193,12 +507,49 @@
      * @returns {Object[]}
      */
     dom.query = function (selector,context) {
-        var currentContext = context ? context.getElementById ? context : document : document;
-
-        return 	selector.match(regexpSelector.findId)  		    ? [currentContext.getElementById(selector.substr(1))] :
-                selector.match(regexpSelector.findClass) 	    ? zp.toArray(currentContext.getElementsByClassName(selector.substr(1))) :
-                selector.match(regexpSelector.findTag)   	    ? zp.toArray(currentContext.getElementsByTagName  (selector)) :
+        return 	selector.match(regexpFindId)  		    ? [context.getElementById ? context.getElementById(selector.substr(1)) : document.getElementById(selector.substr(1)) ] :
+                selector.match(regexpFindClass) 	    ? zp.toArray(context.getElementsByClassName(selector.substr(1))) :
+                selector.match(regexpFindTag)   	    ? zp.toArray(context.getElementsByTagName  (selector)) :
                 zp.toArray(context.querySelectorAll(selector));
+    };
+
+    /**
+     *
+     * @param {string} tagName
+     * @param {Object} [attr]
+     * @returns {dom}
+     */
+    dom.create = function (tagName, attr) {
+        var node = new dom(document.createElement(tagName));
+        if (attr){
+            node.attr(attr);
+        }
+        return node;
+    };
+    /**
+     *
+     * @param {string} selector
+     * @param {Object} context
+     * @returns {boolean}
+     */
+    dom.is = function (selector,context) {
+        var node = new dom.query(selector,context);
+        return node.length > 0;
+    };
+
+    /**
+     *
+     * @returns {Number}
+     */
+    dom.height = function () {
+        return window.innerHeight;
+    };
+    /**
+     *
+     * @returns {Number}
+     */
+    dom.width = function () {
+        return window.innerWidth;
     };
 
 
