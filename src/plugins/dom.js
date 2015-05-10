@@ -576,7 +576,7 @@
      * @returns {boolean}
      */
     dom.is = function (selector,context) {
-        var node = new dom.query(selector,context);
+        var node = new dom(selector,context);
         return node.length > 0;
     };
 
@@ -594,7 +594,6 @@
     dom.width = function () {
         return window.innerWidth;
     };
-
 
     zp.extend('dom', dom);
 
