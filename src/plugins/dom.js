@@ -12,12 +12,7 @@
 
         onReadyList = [],
 
-        regexpFindTag  	= /^[-_a-z0-9]+$/i,
-
-        regexpFindClass	= /^\.[-_a-z0-9]+$/i,
-
-        regexpFindId   	= /^#[-_a-z0-9]+$/i,
-
+        regexpSelector = /^(?:#([\w-]+)|(\w+)|\.([\w-]+))$/,
 
         ignoreCssPostfix =  {
             zIndex: true,
@@ -128,22 +123,19 @@
             return this;
         }
 
-        var currentContext = context || document;
 
         this.nodes =
-            zp.isString(selector)       ? dom.query(selector,currentContext) :
+            zp.isString(selector)       ? dom.query(selector,context || document) :
             selector === window         ? [ document ] :
             selector instanceof dom     ? zp.toArray(selector.nodes) :
             dom.isElement(selector)     ? [selector] :
             zp.isArray(selector)  		? selector :
             [];
         //Hak
-        this.nodes.forEach(function (el,index) {
-            this[index] = el;
-        }.bind(this));
-
-        this.length = this.nodes.length;
-
+        var i = 0, l = this.nodes.length;
+        for(; i < l; i++){
+            this[i] = this.nodes[i];
+        }
         return this;
     };
 
@@ -162,8 +154,9 @@
         /**
          * @type {Number}
          */
-        length: 0,
-
+        get length () {
+            return this.nodes.length;
+        },
         /**
          * @type {Function}
          */
@@ -249,7 +242,11 @@
          * @param {Function} callback
          */
         each : function (callback) {
-            this.nodes.forEach(callback.bind(this));
+            var i = 0,
+                l = this.nodes.length;
+            for(; i < l; i++){
+                callback.call(this, this.nodes[i],i);
+            }
             return this;
         },
         /**
@@ -550,10 +547,25 @@
      * @returns {Object[]}
      */
     dom.query = function (selector,context) {
-        return 	selector.match(regexpFindId)  		    ? [context.getElementById ? context.getElementById(selector.substr(1)) : document.getElementById(selector.substr(1)) ] :
-                selector.match(regexpFindClass) 	    ? zp.toArray(context.getElementsByClassName(selector.substr(1))) :
-                selector.match(regexpFindTag)   	    ? zp.toArray(context.getElementsByTagName  (selector)) :
-                zp.toArray(context.querySelectorAll(selector));
+        var match = regexpSelector.exec(selector),
+            result = [];
+        if(match){
+            if(match[1]){
+                result = [context.getElementById ? context.getElementById(match[1]) : document.getElementById(match[1])];
+            }
+            else if (match[2]) {
+                [].push.apply(result,context.getElementsByTagName(selector));
+            }
+            else if (match[3] ) {
+                [].push.apply(result,context.getElementsByClassName(match[3]));
+            }
+        }
+        else{
+
+            [].push.apply(result,context.querySelectorAll(selector));
+        }
+        return result;
+
     };
 
     /**
