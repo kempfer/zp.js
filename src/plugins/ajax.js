@@ -8,10 +8,10 @@
     var
         /**
          *
-         * @param object|string|number
+         * @param {object|string|number}
          * @returns {string}
          */
-        stringify = function ajaxStringify (object) {
+        prepareData = function ajaxPrepareData (object) {
             var 
                 i,
                 array = [], 
@@ -74,7 +74,7 @@
          * @param Object headers
          * @param boolean sendFormData
          */
-        setHeaders =  function ajaxSetHeaders (xhr,headers,isSendFormData) {
+        setHeaders =  function ajaxSetHeaders (xhr,headers,isSendFormData) {*
             for(var key in headers){
                 if(isSendFormData && key == 'Content-Type'){
                     continue;
@@ -115,7 +115,8 @@
 
         /**
          *
-         * @param Object config
+         * @param {Object|String} config
+         * @this ajax
          * @returns {ajax}
          */
         ajax = function ajaxConstructor (config) {
@@ -125,7 +126,7 @@
             var 
                 readyConfig = prepareConfig(config),
                 method = readyConfig.method.toUpperCase(),
-                sendData = stringify(readyConfig.data),
+                sendData = prepareData(readyConfig.data),
                 url = prepareUrl(readyConfig.url,method,sendData,readyConfig.cache),
                 isSendFormData = !zp.isUndefined(window.FormData) && sendData instanceof window.FormData;
             this.id = zp.uniqueId();
