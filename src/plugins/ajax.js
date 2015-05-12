@@ -57,15 +57,7 @@
          * @returns {Object}
          */
         prepareConfig = function ajaxPrepareConfig (config) {
-            var readyConfig;
-            if(zp.isString(config)){
-                readyConfig = ajax.defaultConfig;
-                readyConfig.url = config;
-            }
-            else{
-                readyConfig = zp.merger(ajax.defaultConfig,config);
-            }
-            return readyConfig;
+            return zp.merger(ajax.defaultConfig,config);
         },
 
         /**
@@ -78,7 +70,7 @@
             var key;
             for(key in headers){
                 if(headers.hasOwnProperty(key)){
-                    if(!isSendFormData && key !== 'Content-Type'){
+                    if(!(isSendFormData && key === 'Content-Type')){
                         xhr.setRequestHeader(key,headers[key]);
                     }
                 }
@@ -92,14 +84,14 @@
          * @param  config
          * @returns {Function}
          */
-        onReady =  function ajaxOnReady (xhr, config) {
+        onReady = function ajaxOnReady (xhr, config) {
             return function ajaxOnReadyStateChange (e) {
                 var result;
                 if (xhr.readyState == 4) {
                     if (xhr.status == 200) {
                         result = xhr.responseText;
                         if(config.responseType.toUpperCase() == 'JSON'){
-                            result = zp.decode(result);
+                            result = zp.decode(result, true);
                         }
                         if(zp.isFunction(config.onLoad)){
                             config.onLoad(result,xhr,e);
