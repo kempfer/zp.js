@@ -12,19 +12,19 @@
          * @returns {string}
          */
         prepareData = function ajaxPrepareData (object) {
-            var 
+            var
                 i,
-                array = [], 
+                array = [],
                 e = encodeURIComponent;
             if (zp.isEmpty(object)){
-                return '';  
-            } 
+                return '';
+            }
             if(!zp.isUndefined(window.FormData) && object instanceof window.FormData){
                 return object;
             }
             if (zp.isString(object) || zp.isNumber(object)) {
-                return String( object );  
-            } 
+                return String( object );
+            }
             for (i in object){
                 if (object.hasOwnProperty(i)) {
                     array.push( e(i) + '=' + e(object[i]) );
@@ -46,9 +46,9 @@
             if (method == 'GET' && data) {
                 url += separator + data;
             }
-            if (!cache) {               
+            if (!cache) {
                 url += separator + 'rand=' + Date.now();
-            }   
+            }
             return url;
         },
         /**
@@ -70,16 +70,18 @@
 
         /**
          *
-         * @param XMLHttpRequest  xhr
-         * @param Object headers
-         * @param boolean sendFormData
+         * @param {XMLHttpRequest}  xhr
+         * @param {Object} headers
+         * @param {boolean} sendFormData
          */
-        setHeaders =  function ajaxSetHeaders (xhr,headers,isSendFormData) {*
-            for(var key in headers){
-                if(isSendFormData && key == 'Content-Type'){
-                    continue;
+        setHeaders =  function ajaxSetHeaders (xhr,headers,isSendFormData) {
+            var key;
+            for(key in headers){
+                if(headers.hasOwnProperty(key)){
+                    if(!isSendFormData && key !== 'Content-Type'){
+                        xhr.setRequestHeader(key,headers[key]);
+                    }
                 }
-                xhr.setRequestHeader(key,headers[key]);
             }
             xhr.setRequestHeader('X-Requested-With','XMLHttpRequest');
         },
@@ -90,11 +92,12 @@
          * @param  config
          * @returns {Function}
          */
-        onReady =  function ajaxOnReady (xhr, config) {      
+        onReady =  function ajaxOnReady (xhr, config) {
             return function ajaxOnReadyStateChange (e) {
-                if (xhr.readyState == 4) {              
+                var result;
+                if (xhr.readyState == 4) {
                     if (xhr.status == 200) {
-                        var result = xhr.responseText;
+                        result = xhr.responseText;
                         if(config.responseType.toUpperCase() == 'JSON'){
                             result = zp.decode(result);
                         }
@@ -102,13 +105,13 @@
                             config.onLoad(result,xhr,e);
                         }
                     }
-                    else{       
-                        var result = xhr.responseText;
+                    else{
+                        result = xhr.responseText;
                         if(zp.isFunction(config.onError)){
                             config.onError(result,xhr,e);
                         }
 
-                    }               
+                    }
                 }
             }
         },
@@ -123,7 +126,7 @@
             if (! (this instanceof ajax)) {
                 return new ajax(config);
             }
-            var 
+            var
                 readyConfig = prepareConfig(config),
                 method = readyConfig.method.toUpperCase(),
                 sendData = prepareData(readyConfig.data),
@@ -168,7 +171,7 @@
         timeout : 30000,
         data : {},
         cache : true,
-        async	: true,
+        async : true,
         url : location.href,
         headers : {
             'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
