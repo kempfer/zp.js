@@ -16,12 +16,16 @@
         var ajaxMy = zp.ajax({
             url : 'index.php',
             method: 'post',
-            data : {test : ''},
+            responseType : 'json',
+            data : {test : 123},
             onLoad : function (result,xhr,e) {
-                console.log(xhr);
+                console.log(result);
             },
             onAbort : function (e) {
                 console.log('onAbort');
+            },
+            onError : function (result,xhr,e) {
+                console.log('Error');
             }
         });
         ;(function () {
