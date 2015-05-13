@@ -4,8 +4,8 @@
 module("zp Ajax");
 asyncTest('GET', function(){
 
-    expect(3);
-    QUnit.stop(2);
+    expect(6);
+    QUnit.stop(5);
     zp.ajax({
         url : '/index.php?test=1',
         method : 'GET',
@@ -31,8 +31,40 @@ asyncTest('GET', function(){
         data: {test: 2},
         responseType: 'json',
         onLoad: function (response) {
+            equal(response.test, 'ok', 'Send Get "/index.php" response JSON. use responseType: "json"');
+            start();
+        }
+    });
 
-            equal(response.test, 'ok', 'Send Get "/index.php" response JSON');
+    zp.ajax({
+        url: '/index.php',
+        method: 'GET',
+        data: {test: 2},
+        responseType: 'JSON',
+        onLoad: function (response) {
+            equal(response.test, 'ok', 'Send Get "/index.php" response JSON. use responseType: "JSON"');
+            start();
+        }
+    });
+
+    zp.ajax({
+        url: '/index.php',
+        method: 'get',
+        data: {test: 2},
+        responseType: 'JSON',
+        onLoad: function (response) {
+            equal(response.test, 'ok', 'Send Get "/index.php" response JSON. use method: "get"');
+            start();
+        }
+    });
+
+    zp.ajax({
+        url: '/index.php',
+        method: 'get',
+        data: "test=2",
+        responseType: 'JSON',
+        onLoad: function (response) {
+            equal(response.test, 'ok', 'Send Get "/index.php" response JSON. data: "test=2"');
             start();
         }
     });

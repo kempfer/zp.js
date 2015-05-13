@@ -8,23 +8,23 @@
     var
         /**
          *
-         * @param object|string|number
+         * @param {object|string|number}
          * @returns {string}
          */
-        stringify = function ajaxStringify (object) {
-            var 
+        prepareData = function ajaxPrepareData (object) {
+            var
                 i,
-                array = [], 
+                array = [],
                 e = encodeURIComponent;
             if (zp.isEmpty(object)){
-                return '';  
-            } 
+                return '';
+            }
             if(!zp.isUndefined(window.FormData) && object instanceof window.FormData){
                 return object;
             }
             if (zp.isString(object) || zp.isNumber(object)) {
-                return String( object );  
-            } 
+                return String( object );
+            }
             for (i in object){
                 if (object.hasOwnProperty(i)) {
                     array.push( e(i) + '=' + e(object[i]) );
@@ -46,9 +46,9 @@
             if (method == 'GET' && data) {
                 url += separator + data;
             }
-            if (!cache) {               
+            if (!cache) {
                 url += separator + 'rand=' + Date.now();
-            }   
+            }
             return url;
         },
         /**
@@ -57,29 +57,23 @@
          * @returns {Object}
          */
         prepareConfig = function ajaxPrepareConfig (config) {
-            var readyConfig;
-            if(zp.isString(config)){
-                readyConfig = ajax.defaultConfig;
-                readyConfig.url = config;
-            }
-            else{
-                readyConfig = zp.merger(ajax.defaultConfig,config);
-            }
-            return readyConfig;
+            return zp.merger(ajax.defaultConfig,config);
         },
 
         /**
          *
-         * @param XMLHttpRequest  xhr
-         * @param Object headers
-         * @param boolean sendFormData
+         * @param {XMLHttpRequest}  xhr
+         * @param {Object} headers
+         * @param {boolean} sendFormData
          */
         setHeaders =  function ajaxSetHeaders (xhr,headers,isSendFormData) {
-            for(var key in headers){
-                if(isSendFormData && key == 'Content-Type'){
-                    continue;
+            var key;
+            for(key in headers){
+                if(headers.hasOwnProperty(key)){
+                    if(!(isSendFormData && key === 'Content-Type')){
+                        xhr.setRequestHeader(key,headers[key]);
+                    }
                 }
-                xhr.setRequestHeader(key,headers[key]);
             }
             xhr.setRequestHeader('X-Requested-With','XMLHttpRequest');
         },
@@ -90,42 +84,44 @@
          * @param  config
          * @returns {Function}
          */
-        onReady =  function ajaxOnReady (xhr, config) {      
+        onReady = function ajaxOnReady (xhr, config) {
             return function ajaxOnReadyStateChange (e) {
-                if (xhr.readyState == 4) {              
+                var result;
+                if (xhr.readyState == 4) {
                     if (xhr.status == 200) {
-                        var result = xhr.responseText;
+                        result = xhr.responseText;
                         if(config.responseType.toUpperCase() == 'JSON'){
-                            result = zp.decode(result);
+                            result = zp.decode(result, true);
                         }
                         if(zp.isFunction(config.onLoad)){
                             config.onLoad(result,xhr,e);
                         }
                     }
-                    else{       
-                        var result = xhr.responseText;
+                    else{
+                        result = xhr.responseText;
                         if(zp.isFunction(config.onError)){
                             config.onError(result,xhr,e);
                         }
 
-                    }               
+                    }
                 }
             }
         },
 
         /**
          *
-         * @param Object config
+         * @param {Object|String} config
+         * @this ajax
          * @returns {ajax}
          */
         ajax = function ajaxConstructor (config) {
             if (! (this instanceof ajax)) {
                 return new ajax(config);
             }
-            var 
+            var
                 readyConfig = prepareConfig(config),
                 method = readyConfig.method.toUpperCase(),
-                sendData = stringify(readyConfig.data),
+                sendData = prepareData(readyConfig.data),
                 url = prepareUrl(readyConfig.url,method,sendData,readyConfig.cache),
                 isSendFormData = !zp.isUndefined(window.FormData) && sendData instanceof window.FormData;
             this.id = zp.uniqueId();
@@ -167,7 +163,7 @@
         timeout : 30000,
         data : {},
         cache : true,
-        async	: true,
+        async : true,
         url : location.href,
         headers : {
             'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
