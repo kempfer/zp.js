@@ -41,16 +41,17 @@
          * @returns {{init: Object}|*}
          */
         construct = function zpClassConstruct (constructor, args) {
-            return this.init ? this.init.apply(this, args) : this;
+           this.callParent = callParent.bind(this);
+           return this.init ? this.init.apply(this, args) : this;
         },
 
         /**
          *
          * @returns {*}
          */
-        callParent = function (nameParent) {
-            var parent = resource[this.id];
-            console.log(this);
+        callParent = function zpClassCallParent (nameParent) {
+            var thatResource = resource[this.id],
+                parent = thatResource.parent;
             if(!zp.isUndefined(parent) && zp.isFunction(parent[nameParent]) ){
                 return  parent[nameParent].apply(this);
             }
@@ -62,24 +63,26 @@
          */
         prepareClass = function zpClassPrepareClass (Constructor,object) {
             var key,
-                cloneObject;
+                cloneObject,
+                cloneParent;
             object = object || {};
+            Constructor.prototype.id = zp.uniqueId();
+            resource[Constructor.prototype.id] = {};
+            if(object['extend']){
+                cloneParent = Object.create(object['extend'].prototype);
+                Constructor.prototype = cloneParent;
+                resource[Constructor.prototype.id] = {
+                    parent : object['extend'].prototype
+                };
+                delete object['extend'];
+            }
             if (zp.isFunction(object)) {
                 object = { init: object };
             }
-            if(object['extend']){
-                Constructor.prototype = Object.create(object['extend'].prototype);
-            }
-            Constructor.prototype.id = zp.uniqueId();
-            resource[Constructor.prototype.id] = {
-                parent : object['extend']
-            };
-            delete object['extend'];
             cloneObject = Object.create(object);
-            for (key in object) {
+            for (key in cloneObject) {
                 Constructor.prototype[key] = cloneObject[key];
             }
-            Constructor.prototype.callParent = callParent.bind(Constructor);
         },
 
 
@@ -107,6 +110,7 @@
                 prepareClass(Constructor,object);
                 Constructor.prototype.constructor = Constructor;
                 return Constructor;
+
             }
 
         };

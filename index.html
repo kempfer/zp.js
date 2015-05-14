@@ -3,38 +3,52 @@
 	<head>
 		<meta charset="utf-8">
 		<title>Zp lib</title>
-		<script type="text/javascript"  src="core/zp.js"></script>
-        <script type="text/javascript"  src="plugins/ajax.js"></script>
-        <script type="text/javascript"  src="plugins/dom.js"></script>
+		<script type="text/javascript"  src="src/core/zp.js"></script>
+        <script type="text/javascript"  src="src/plugins/ajax.js"></script>
+        <script type="text/javascript"  src="src/plugins/dom.js"></script>
+        <script type="text/javascript"  src="src/plugins/class.js"></script>
     <body>
         <form id="test-form">
             <input type="hidden" name="test" value="123">
         </form>
 		<script>
-		console.log(zp);
-       // var formData = new FormData(document.getElementById('test-form'));
-        var ajaxMy = zp.ajax({
-            url : 'index.php',
-            method: 'post',
-            responseType : 'json',
-            data : {test : 123},
-            onLoad : function (result,xhr,e) {
-                console.log(result);
-            },
-            onAbort : function (e) {
-                console.log('onAbort');
-            },
-            onError : function (result,xhr,e) {
-                console.log('Error');
+            var test;
+            var onReady = false;
+            function readyFunc () {
+                if(onReady){
+                    return;
+                }
+                onReady =  true;
+                var animal = zp.create({
+                    init : function () {
+                        console.log('animal init');
+                        //this.type = 'animal';
+                    },
+                    getType : function  (){
+                        return this.type;
+                    }
+                });
+
+                var dog = zp.create({
+                    extend : animal,
+                    init : function () {
+                        console.log('dog Init');
+                        this.callParent('init');
+                    },
+                    type : 'dog',
+                    getType : function () {
+                        return this.callParent('getType');
+                    }
+                });
+
+                test = new dog();
+
+               //var test2 =  new animal();
+                //console.log(test2.getType());
+
             }
-        });
-        ;(function () {
-
-            "use strict";
-
-        })();
-
-       //ajaxMy.abort();
+            document.addEventListener('DOMContentLoaded', readyFunc, false);
+            window.addEventListener('load', readyFunc, false);
 		</script>
 	</body>
 </html>
