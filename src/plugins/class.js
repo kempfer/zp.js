@@ -63,7 +63,27 @@
                 }
                 return  parent[nameParent].apply(this,arg);
             }
+            else{
+                throw new Error('The method "parent" cannot be called.');
+            }
         },
+
+        /**
+         *
+         * @param {Object} Class
+         * @param {Object} object
+         */
+        inheritParent = function zpClassInheritParent  (Class,object) {
+            if(!zp.isUndefined(object['extend'])){
+                var cloneParent = Object.create(object['extend'].prototype);
+                Class.prototype = cloneParent;
+                resource[Class.prototype.id] = {
+                    parent : object['extend'].prototype
+                };
+                delete object['extend'];
+            }
+        },
+
         /**
          *
          * @param {Function} Constructor
@@ -71,19 +91,11 @@
          */
         prepareClass = function zpClassPrepareClass (Constructor,object) {
             var key,
-                cloneObject,
-                cloneParent;
+                cloneObject;
             object = object || {};
             Constructor.prototype.id = zp.uniqueId();
             resource[Constructor.prototype.id] = {};
-            if(object['extend']){
-                cloneParent = Object.create(object['extend'].prototype);
-                Constructor.prototype = cloneParent;
-                resource[Constructor.prototype.id] = {
-                    parent : object['extend'].prototype
-                };
-                delete object['extend'];
-            }
+            inheritParent(Constructor,object);
             if (zp.isFunction(object)) {
                 object = { init: object };
             }
@@ -102,7 +114,11 @@
              * @param object
              */
             define : function (name, object) {
-
+                var arrayPath = name.split('.'),
+                    Constructor = zpClass.create(object);
+                Constructor.prototype.PATH = name;
+                Constructor.prototype.name = arrayPath[arrayPath.length - 1];
+                define(name, Constructor);
             },
 
             /**
@@ -112,7 +128,7 @@
              */
             create : function (object) {
                 var Constructor;
-                Constructor = function (){
+                Constructor = function zpClass (){
                     return construct.call(this, Constructor, arguments);
                 };
                 prepareClass(Constructor,object);
