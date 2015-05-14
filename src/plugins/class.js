@@ -51,9 +51,17 @@
          */
         callParent = function zpClassCallParent (nameParent) {
             var thatResource = resource[this.id],
-                parent = thatResource.parent;
+                parent = thatResource.parent,
+                i = 0,
+                arg = [];
             if(!zp.isUndefined(parent) && zp.isFunction(parent[nameParent]) ){
-                return  parent[nameParent].apply(this);
+                for(i = 0; i < arguments.length; i++){
+                    if(i === 0){
+                        continue;
+                    }
+                    arg.push(arguments[i]);
+                }
+                return  parent[nameParent].apply(this,arg);
             }
         },
         /**

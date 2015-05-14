@@ -20,28 +20,33 @@
                 }
                 onReady =  true;
                 var animal = zp.create({
-                    init : function () {
-                        console.log('animal init');
-                        //this.type = 'animal';
+                    init : function (type,name) {
+                        this.type = type;
+                        this.name = name;
                     },
                     getType : function  (){
                         return this.type;
+                    },
+                    getName : function () {
+                        return this.name;
                     }
                 });
 
                 var dog = zp.create({
                     extend : animal,
-                    init : function () {
+                    init : function (type,name) {
                         console.log('dog Init');
-                        this.callParent('init');
+                        this.callParent('init',type,name);
                     },
-                    type : 'dog',
                     getType : function () {
                         return this.callParent('getType');
+                    },
+                    getName : function () {
+                        return this.callParent('getName');
                     }
                 });
 
-                test = new dog();
+                test = new dog('dog', 'dog name');
 
                //var test2 =  new animal();
                 //console.log(test2.getType());
