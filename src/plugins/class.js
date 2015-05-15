@@ -110,14 +110,12 @@
 
             /**
              *
-             * @param name
-             * @param object
+             * @param {String} name
+             * @param {Object} object
              */
             define : function (name, object) {
-                var arrayPath = name.split('.'),
-                    Constructor = zpClass.create(object);
+                var Constructor = zpClass.create(object);
                 Constructor.prototype.PATH = name;
-                Constructor.prototype.name = arrayPath[arrayPath.length - 1];
                 define(name, Constructor);
             },
 
