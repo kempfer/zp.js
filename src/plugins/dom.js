@@ -118,18 +118,13 @@
             return new dom(selector,context);
         }
 
-        if (!arguments.length) {
-            this.nodes = [document];
-            return this;
-        }
-
-
         this.nodes =
+            zp.isUndefined(selector)    ? [ document ] :
             zp.isString(selector)       ? dom.query(selector,context || document) :
-            selector === window         ? [ document ] :
             selector instanceof dom     ? zp.toArray(selector.nodes) :
-            dom.isElement(selector)     ? [selector] :
+            dom.isElement(selector)     ? [ selector ] :
             zp.isArray(selector)  		? selector :
+            selector === window         ? [ document ] :
             [];
         //Hak
         var i = 0, l = this.nodes.length;
@@ -139,11 +134,7 @@
         return this;
     };
 
-    /**
-     *
-     * @property {Array.<Object>} nodes
-     * @property {Function} constructor
-     */
+
     dom.prototype = {
 
         /**
@@ -190,10 +181,11 @@
         get size() {
             var node, rect,
                 first = this.first;
-            if (!zp.dom.isElement(first)) {
+            node = (first === document) ? document.body : first;
+            console.log(!node)
+            if(!node || !node.getBoundingClientRect){
                 return {width : 0, height : 0};
             }
-            node = (first === document) ? document.body : first;
             rect = node.getBoundingClientRect();
             return {width : rect.width, height : rect.height};
         },
@@ -549,6 +541,7 @@
     dom.query = function (selector,context) {
         var match = regexpSelector.exec(selector),
             result = [];
+        context = context || document;
         if(match){
             if(match[1]){
                 result = [context.getElementById ? context.getElementById(match[1]) : document.getElementById(match[1])];
