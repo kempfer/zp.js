@@ -21,6 +21,8 @@
                 onReady =  true;
                 zp.define('zp.classes.animal',{
                     init : function (type,name) {
+                        console.log('animal Init');
+                        console.log(this);
                         this.type = type;
                         this.name = name;
                     },
@@ -31,24 +33,13 @@
                         return this.name;
                     }
                 });
-                /*var animal = zp.create({
-                    init : function (type,name) {
-                        this.type = type;
-                        this.name = name;
-                    },
-                    getType : function  (){
-                        return this.type;
-                    },
-                    getName : function () {
-                        return this.name;
-                    }
-                });*/
+
 
                 var dog = zp.create({
                     extend : zp.classes.animal,
                     init : function (type,name) {
-                        console.log('dog Init');
-                        this.callParent('init',type,name);
+                        console.log('dog init');
+                        return this.callParent('init',type,name);
                     },
                     getType : function () {
                         return this.callParent('getType');
@@ -56,15 +47,30 @@
                     getName : function () {
                         return this.callParent('getName');
                     },
-                    get info () {
-                        return this.name + ' ' + this.name;
-                    }
+                    name : 'dog'
                 });
 
-                test = new dog('dog', 'dog name');
-                console.log(test instanceof zp.classes.animal);
+
                //var test2 =  new animal();
-                //console.log(test2.getType());
+                //console.log(test2.getType())
+                // f
+                // o();
+                var i = 0;
+                var dog2;
+                var start = new Date().getTime();
+                for(; i < 1; i++) {
+                    dog2 =  zp.create({
+                    extend : dog,
+                         init : function (type,name) {
+                             console.log('dog2 init');
+                            // return this.callParent('init',type,name);
+                         },
+                         name : 'dog2'
+                    });
+                }
+                console.log((new Date().getTime() - start)/1000);
+                test =  new dog2('dog', 'dog name');
+                console.log(test instanceof zp.classes.animal);
 
             }
             document.addEventListener('DOMContentLoaded', readyFunc, false);

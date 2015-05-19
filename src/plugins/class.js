@@ -8,7 +8,12 @@
 
      "use strict";
 
-    var resource = {},
+    var
+        F = function () {},
+
+        slice = Array.prototype.slice,
+
+        resource = {},
 
         /**
          *
@@ -36,35 +41,17 @@
 
         /**
          *
-         * @param constructor
-         * @param args
-         * @returns {{init: Object}|*}
-         */
-        construct = function zpClassConstruct (constructor, args) {
-           this.callParent = callParent.bind(this);
-           return this.init ? this.init.apply(this, args) : this;
-        },
-
-        /**
-         *
+         * @param {String} methodName
          * @returns {*}
          */
-        callParent = function zpClassCallParent (nameParent) {
-            var thatResource = resource[this.id],
-                parent = thatResource.parent,
-                i = 0,
-                arg = [];
-            if(!zp.isUndefined(parent) && zp.isFunction(parent[nameParent]) ){
-                for(i = 0; i < arguments.length; i++){
-                    if(i === 0){
-                        continue;
-                    }
-                    arg.push(arguments[i]);
-                }
-                return  parent[nameParent].apply(this,arg);
-            }
-            else{
-                throw new Error('The method "parent" cannot be called.');
+        callParent = function zpClassCallParent (methodName) {
+            var parent = this.Parent,
+                fn = parent[methodName];
+            console.log(parent);
+            if(zp.isFunction(fn)){
+                return (arguments.length > 1)
+                    ? fn.apply(this, slice.call(arguments, 1))
+                    : fn.call(this)
             }
         },
 
@@ -74,14 +61,15 @@
          * @param {Object} object
          */
         inheritParent = function zpClassInheritParent  (Class,object) {
-            if(!zp.isUndefined(object['extend'])){
-                var cloneParent = Object.create(object['extend'].prototype);
-                Class.prototype = cloneParent;
-                resource[Class.prototype.id] = {
-                    parent : object['extend'].prototype
-                };
-                delete object['extend'];
+            var parent = object['extend'] || Object;
+            Class.prototype = Object.create(parent.prototype);
+            Class.prototype.resource_id = zp.uniqueId();
+            resource[Class.prototype.resource_id] = {
+                parent : parent.prototype
             }
+            Class.prototype.Parent = parent.prototype
+            Class.prototype.callParent = callParent;
+            delete object['extend'];
         },
 
         /**
@@ -89,19 +77,17 @@
          * @param {Function} Constructor
          * @param {Object} object
          */
-        prepareClass = function zpClassPrepareClass (Constructor,object) {
-            var key,
-                cloneObject;
+        prepareClass = function zpClassPrepareClass (constructor,object) {
+            var key;
             object = object || {};
-            Constructor.prototype.id = zp.uniqueId();
-            resource[Constructor.prototype.id] = {};
-            inheritParent(Constructor,object);
+            inheritParent(constructor,object);
             if (zp.isFunction(object)) {
                 object = { init: object };
             }
-            cloneObject = Object.create(object);
-            for (key in cloneObject) {
-                Constructor.prototype[key] = cloneObject[key];
+            for (key in object) {
+                if(object.hasOwnProperty(key)){
+                    constructor.prototype[key] = object[key];
+                }
             }
         },
 
@@ -115,7 +101,7 @@
              */
             define : function (name, object) {
                 var Constructor = zpClass.create(object);
-                Constructor.prototype.PATH = name;
+                Constructor.prototype.namespace = name;
                 define(name, Constructor);
             },
 
@@ -125,12 +111,26 @@
              * @returns {Object}
              */
             create : function (object) {
-                var Constructor;
-                Constructor = function zpClass (){
-                    return construct.call(this, Constructor, arguments);
-                };
+                var
+                    Constructor = function  zpClass () {
+                        var parent = resource[Constructor.prototype.resource_id].parent;
+                        if(parent.hasOwnProperty('init')){
+                            parent.init.apply(this,arguments);
+                        }
+
+                        if(Constructor.prototype.hasOwnProperty('init')){
+                            Constructor.prototype.init.apply(this,arguments);
+                        }
+                        return this;
+                    },
+                    name = object.hasOwnProperty('name') ? object['name'] : 'zpClass_' + zp.uniqueId();
                 prepareClass(Constructor,object);
                 Constructor.prototype.constructor = Constructor;
+                Constructor.prototype.name = name;
+
+                Constructor.prototype.toString = function () {
+                    return '[object zpClass]';
+                };
                 return Constructor;
 
             }
