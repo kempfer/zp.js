@@ -119,12 +119,12 @@
         if (this instanceof Dom) {
             this.nodes =
                 zp.isUndefined(selector) ? [document] :
-                    zp.isString(selector) ? Dom.query(selector, context || document) :
-                        selector instanceof Dom ? zp.toArray(selector.nodes) :
-                            Dom.isElement(selector) ? [selector] :
-                                zp.isArray(selector) ? selector :
-                                    selector === window ? [document] :
-                                        [];
+                zp.isString(selector) ? Dom.query(selector, context || document) :
+                selector instanceof Dom ? zp.toArray(selector.nodes) :
+                Dom.isElement(selector) ? [selector] :
+                zp.isArray(selector) ? selector :
+                selector === window ? [document] :
+                [];
             l = this.nodes.length;
             //Hak
             while (i < l) {
@@ -286,7 +286,7 @@
          * @param {string} attrName
          * @returns {Dom}
          */
-        reomveAttr: function (attrName) {
+        removeAttr: function (attrName) {
             this.each(function (node) {
                 if (node.removeAttribute) {
                     node.removeAttribute(attrName);
@@ -301,10 +301,10 @@
          * @returns {Dom}
          */
         clone: function (deep) {
-            var clones = [],
-                deep = zp.isUndefined(deep) ? true : false;
+            var clones = [];
+                deep = !!zp.isUndefined(deep);
             this.each(function (node) {
-                if (zp.Dom.isElement(node)) {
+                if (zp.dom.isElement(node)) {
                     clones.push(node.cloneNode(deep));
                 }
             });
@@ -372,14 +372,13 @@
          *
          * @param string [key]
          * @param {number|string} [value]
-         * @returns {Dom}
+         * @returns {Dom}||{void}
          */
         css: zp.accessor({
             get: function DomGetCss(property) {
                 if (Dom.isElement(this.first)) {
                     return window.getComputedStyle(this.first, "").getPropertyValue(hyphenate(property));
                 }
-                return;
             },
             set: function DomSetCss(property, value) {
                 if (zp.isNumber(value) && !ignoreCssPostfix[property]) {
@@ -450,7 +449,7 @@
 
         /**
          *
-         * @param [String|Array] className
+         * @param {String|Array} className
          * @returns {Dom}
          */
         addClass: function (className) {

@@ -218,6 +218,116 @@ QUnit.test( "each", function( assert ) {
     document.body.removeChild(element);
 });
 
+QUnit.test( "removeAttr", function( assert ) {
+    var
+        findElement,
+        element = document.createElement('div');
+    element.setAttribute('id','div-id');
+    document.body.appendChild(element);
+
+    findElement = zp.dom('#div-id');
+    findElement.removeAttr('id');
+
+    assert.ok( element.getAttribute('id') === null , "element.getAttribute('id') === null" );
+
+    document.body.removeChild(element);
+});
+
+QUnit.test( "clone", function( assert ) {
+    var
+        findElement,
+        clone,
+        element = document.createElement('div');
+    element.setAttribute('id','div-id');
+    document.body.appendChild(element);
+
+    findElement = zp.dom('#div-id');
+    clone = findElement.clone();
+
+    assert.ok( clone instanceof zp.dom, "clone instanceof zp.dom" );
+    assert.ok( clone.first !== element, "clone.first !== element" );
+    assert.ok( zp.dom.isElement(clone.first), "zp.dom.isElement(clone.first)" );
+
+    document.body.removeChild(element);
+});
+
+QUnit.test( "remove", function( assert ) {
+    var
+        findElement,
+        element = document.createElement('div');
+    element.setAttribute('id','div-id');
+    document.body.appendChild(element);
+
+    findElement = zp.dom('#div-id');
+
+
+    assert.ok( findElement instanceof zp.dom, "findElement instanceof zp.dom" );
+    assert.ok( zp.dom.isElement(findElement.first), "zp.dom.isElement(findElement.first)" );
+
+    findElement.remove();
+
+    assert.ok( document.getElementById('div-id') === null, "document.getElementById('div-id') === null" );
+
+});
+
+QUnit.test( "empty", function( assert ) {
+    var
+        findElement,
+        element = document.createElement('div'),
+        child = document.createElement('span');
+
+    element.setAttribute('id','div-id');
+    element.appendChild(child);
+    document.body.appendChild(element);
+
+    findElement = zp.dom('#div-id');
+
+
+    assert.ok( zp.dom.isElement(document.querySelector('#div-id span')), "zp.dom.isElement(document.querySelector('#div-id span'))" );
+
+    findElement.empty();
+
+    assert.ok( document.querySelector('#div-id span') === null, "document.querySelector('#div-id span') === null" );
+    document.body.removeChild(element);
+});
+
+QUnit.test( "find", function( assert ) {
+    var
+        findElement,
+        element = document.createElement('div'),
+        child = document.createElement('span');
+
+    element.setAttribute('id','div-id');
+    element.appendChild(child);
+    document.body.appendChild(element);
+
+    findElement = zp.dom('#div-id').find('span');
+
+    assert.ok( findElement instanceof zp.dom, "findElement instanceof zp.dom" );
+    assert.ok( zp.dom.isElement(findElement.first), "zp.dom.isElement(findElement.first)" );
+    assert.ok( findElement.first  === child, "findElement.first  === child" );
+
+    document.body.removeChild(element);
+});
+
+QUnit.test( "append", function( assert ) {
+    var
+        findElement,
+        element = document.createElement('div'),
+        child = document.createElement('span');
+
+    element.setAttribute('id','div-id');
+    document.body.appendChild(element);
+
+    findElement = zp.dom('#div-id').append(child);
+
+    assert.ok( findElement instanceof zp.dom, "findElement instanceof zp.dom" );
+    assert.ok( zp.dom.isElement(findElement.first), "zp.dom.isElement(findElement.first)" );
+    assert.ok( zp.dom('#div-id').find('span').first  === child, "fzp.dom('#div-id').find('span').first  === child" );
+
+    document.body.removeChild(element);
+});
+
 
 
 
