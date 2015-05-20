@@ -22,7 +22,6 @@
                 zp.define('zp.classes.animal',{
                     init : function (type,name) {
                         console.log('animal Init');
-                        console.log(this);
                         this.type = type;
                         this.name = name;
                     },
@@ -58,18 +57,26 @@
                 var i = 0;
                 var dog2;
                 var start = new Date().getTime();
-                for(; i < 1; i++) {
+
                     dog2 =  zp.create({
                     extend : dog,
                          init : function (type,name) {
                              console.log('dog2 init');
-                            // return this.callParent('init',type,name);
+                             return this.callParent('init',type,name);
                          },
                          name : 'dog2'
                     });
-                }
+                var dog3 =  zp.create({
+                    extend : dog2,
+                    init : function (type,name) {
+                        console.log('dog3 init');
+                        return this.callParent('init',type,name);
+                    },
+                    name : 'dog3'
+                });
+
                 console.log((new Date().getTime() - start)/1000);
-                test =  new dog2('dog', 'dog name');
+                test =  new dog3('dog', 'dog name');
                 console.log(test instanceof zp.classes.animal);
 
             }

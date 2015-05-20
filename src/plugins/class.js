@@ -45,14 +45,20 @@
          * @returns {*}
          */
         callParent = function zpClassCallParent (methodName) {
-            var parent = this.Parent,
-                fn = parent[methodName];
-            console.log(parent);
+            var parent = this.Parent || resource[this.resource_id].parent,
+                fn = parent[methodName],
+                result;
             if(zp.isFunction(fn)){
-                return (arguments.length > 1)
-                    ? fn.apply(this, slice.call(arguments, 1))
-                    : fn.call(this)
+                this.Parent = resource[parent.resource_id].parent;
+                if(arguments.length > 1) {
+                    result = fn.apply(this, slice.call(arguments, 1));
+                }
+                else{
+                    result = fn.call(this)
+                }
+                delete this.Parent;
             }
+            return result;
         },
 
         /**
@@ -67,7 +73,6 @@
             resource[Class.prototype.resource_id] = {
                 parent : parent.prototype
             }
-            Class.prototype.Parent = parent.prototype
             Class.prototype.callParent = callParent;
             delete object['extend'];
         },
@@ -113,11 +118,6 @@
             create : function (object) {
                 var
                     Constructor = function  zpClass () {
-                        var parent = resource[Constructor.prototype.resource_id].parent;
-                        if(parent.hasOwnProperty('init')){
-                            parent.init.apply(this,arguments);
-                        }
-
                         if(Constructor.prototype.hasOwnProperty('init')){
                             Constructor.prototype.init.apply(this,arguments);
                         }
