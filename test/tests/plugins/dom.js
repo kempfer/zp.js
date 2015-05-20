@@ -329,6 +329,204 @@ QUnit.test( "append", function( assert ) {
 });
 
 
+QUnit.test( "addClass", function( assert ) {
+    var
+        findElement,
+        element = document.createElement('div');
+
+    element.setAttribute('id','div-id');
+    document.body.appendChild(element);
+
+    findElement = zp.dom('#div-id');
+    findElement.addClass('test-class');
+
+    assert.ok( element.className === 'test-class', "element.className === 'test-class'" );
+
+    element.className = '';
+    findElement.addClass(['test-class','test-class-2']);
+
+    assert.ok( element.className === 'test-class test-class-2', "element.className === 'test-class test-class-2'" );
+
+    findElement.addClass(['test-class','test-class-2']);
+
+    assert.ok( element.className === 'test-class test-class-2', "element.className === 'test-class test-class-2'" );
+    document.body.removeChild(element);
+});
+
+QUnit.test( "removeClass", function( assert ) {
+    var
+        findElement,
+        element = document.createElement('div');
+
+    element.setAttribute('id','div-id');
+    document.body.appendChild(element);
+
+    element.className = 'test-class test-class-2 test-class-3';
+
+    findElement = zp.dom('#div-id');
+    findElement.removeClass('test-class');
+
+    assert.ok( element.className === 'test-class-2 test-class-3', "element.className === 'test-class-2 test-class-3'" );
+
+    findElement.removeClass(['test-class-2', 'test-class-3']);
+
+    assert.ok( element.className === '', "element.className === ''" );
+
+    document.body.removeChild(element);
+});
+
+QUnit.test( "hasClass", function( assert ) {
+    var
+        findElement,
+        element = document.createElement('div');
+
+    element.setAttribute('id','div-id');
+    document.body.appendChild(element);
+
+    element.className = 'test-class';
+
+    findElement = zp.dom('#div-id');
+
+    assert.ok( findElement.hasClass('test-class'), "findElement.hasClass('test-class')" );
+
+
+    assert.ok(!findElement.hasClass('test-clvvvvass'), "findElement.hasClass('test-clvvvvass')" );
+
+    document.body.removeChild(element);
+});
+
+QUnit.test( "toggleClass", function( assert ) {
+    var
+        findElement,
+        element = document.createElement('div');
+
+    element.setAttribute('id','div-id');
+    document.body.appendChild(element);
+
+    element.className = 'test-class';
+
+    findElement = zp.dom('#div-id');
+
+    findElement.toggleClass('test-class');
+
+    assert.ok( element.className === '', "element.className === ''" );
+
+    findElement.toggleClass('test-class');
+
+    assert.ok( element.className === 'test-class', "element.className === 'test-class'" );
+
+    document.body.removeChild(element);
+});
+
+QUnit.test( "toArray", function( assert ) {
+    var
+        findElement,
+        element = document.createElement('div');
+
+    element.setAttribute('id','div-id');
+    document.body.appendChild(element);
+
+    findElement = zp.dom('#div-id');
+    assert.ok( zp.isArray(findElement.toArray()), "zp.isArray(findElement.toArray())," );
+
+    assert.ok( findElement.toArray().length === 1, "findElement.toArray().length === 1" );
+
+    document.body.removeChild(element);
+});
+
+QUnit.test( "text", function( assert ) {
+    var
+        findElement,
+        element = document.createElement('div'),
+        innerText = document.body.innerText == null ? 'textContent' : 'innerText';
+
+    element.setAttribute('id','div-id');
+    document.body.appendChild(element);
+
+    findElement = zp.dom('#div-id');
+    assert.ok( findElement.text() === '', "findElement.text() === ''" );
+
+    findElement.text('text innerText');
+
+    assert.ok( element[innerText] === 'text innerText', "element[innerText] === 'text innerText'" );
+
+    document.body.removeChild(element);
+});
+
+QUnit.test( "attr", function( assert ) {
+    var
+        findElement,
+        element = document.createElement('div'),
+        innerText = document.body.innerText == null ? 'textContent' : 'innerText';
+
+    element.setAttribute('id','div-id');
+    document.body.appendChild(element);
+
+    findElement = zp.dom('#div-id');
+
+    findElement.attr('test',20);
+
+    assert.ok( element.getAttribute('test') == 20, "element.getAttribute('test') == 20" );
+
+    assert.ok( findElement.attr('test') == 20, "findElement.attr('test')" );
+
+    findElement.attr({'info' : 1, 'info2' : 2});
+
+    assert.ok( element.getAttribute('info') == 1, "element.getAttribute('info') == 1" );
+    assert.ok( element.getAttribute('info2') == 2, "element.getAttribute('info2') == 2" );
+
+    document.body.removeChild(element);
+});
+
+QUnit.test( "css", function( assert ) {
+    var
+        findElement,
+        element = document.createElement('div'),
+        innerText = document.body.innerText == null ? 'textContent' : 'innerText';
+
+    element.setAttribute('id','div-id');
+    document.body.appendChild(element);
+
+    findElement = zp.dom('#div-id');
+
+    findElement.css('width',20);
+
+    assert.ok( element.style.width == '20px', "element.style.width == '20px'" );
+
+    findElement.css({'height' : '10px', 'z-index' : '5', opacity : 0.5});
+
+    assert.ok( element.style.height == '10px', "element.style.height == '10px'" );
+
+    assert.ok( element.style.zIndex == '5', "element.style.zIndex == '5'" );
+
+    assert.ok( element.style.opacity == '0.5', "element.style.opacity == '0.5'" );
+
+    assert.ok( findElement.css('width') == '20px', "findElement.css('width') == '20px'" );
+    assert.ok( findElement.css('opacity') == '0.5', "indElement.css('opacity') == '0.5'" );
+
+    document.body.removeChild(element);
+});
+
+QUnit.test( "html", function( assert ) {
+    var
+        findElement,
+        element = document.createElement('div');
+
+    element.setAttribute('id','div-id');
+    document.body.appendChild(element);
+
+    findElement = zp.dom('#div-id');
+
+    assert.ok( findElement.html() === '', "findElement.html() === ''" );
+
+    findElement.html('<span></span>');
+
+    assert.ok( element.innerHTML === '<span></span>', " element.innerHTML === '<span></span>'" );
+
+    assert.ok( findElement.html() === '<span></span>', "findElement.html() === '<span></span>'" );
+
+    document.body.removeChild(element);
+});
 
 
 
