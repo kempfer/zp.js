@@ -202,6 +202,15 @@
                     return this;
                 }
             }
+        },
+        /**
+         *
+         * @param {Array} array
+         * @param {String} item
+         * @returns {boolean}
+         */
+        inArray : function  (array, item) {
+            return array.indexOf(item) >= 0;
         }
     };
     zp.globalScope['zp'] = zp;

@@ -22,7 +22,7 @@
          * @param {string} str
          * @returns {string}
          */
-        camelCase = function DomCamelCase(str) {
+        camelCase = function domCamelCase(str) {
             return String(str).replace(/-\D/g, function (match) {
                 return match[1].toUpperCase();
             });
@@ -32,7 +32,7 @@
          * @param {string} str
          * @returns {string}
          */
-        hyphenate = function DomHyphenate(str) {
+        hyphenate = function domHyphenate(str) {
             return String(str).replace(/[A-Z]/g, function (match) {
                 return '-' + match[0].toLowerCase();
             });
@@ -41,7 +41,7 @@
         /**
          *
          */
-        readyFunc = function DomReadyFunc() {
+        readyFunc = function domReadyFunc() {
             var i = 0,
                 l = onReadyList.length;
             if (ready === false) {
@@ -61,7 +61,7 @@
          * @param {Number} step
          * @returns {Dom}
          */
-        findParentByStep = function DomFindParentByStep(node, step) {
+        findParentByStep = function domFindParentByStep(node, step) {
             if (zp.isUndefined(step) || step < 0) {
                 step = 1;
             }
@@ -76,29 +76,58 @@
          * @param {string} names
          * @param {string} action
          */
-        actionsClasses = function DomActionsClasses(dom, names, action) {
+        actionsClasses = function domActionsClasses(dom, names, action) {
             var i = 0,
                 classNames = !zp.isArray(names) ? [names] : names,
                 l = classNames.length;
             dom.each(function (node) {
                 while (i < l) {
-                    if (node.classList) {
-                        switch (action) {
-                            case 'add':
-                                node.classList.add(classNames[i]);
-                                break;
-                            case 'remove':
-                                node.classList.remove(classNames[i]);
-                                break;
-                            case 'toggle':
-                                node.classList.toggle(classNames[i]);
-                                break;
-                        }
+                    switch (action) {
+                        case 'add':
+                            new manipulateClass(node).addClass(classNames[i]);
+                            //node.classList.add(classNames[i]);
+                            break;
+                        case 'remove':
+                            node.classList.remove(classNames[i]);
+                            break;
+                        case 'toggle':
+                            node.classList.toggle(classNames[i]);
+                            break;
                     }
                     i += 1;
                 }
             });
+        },
+
+        manipulateClass = function domManipulateClass (node) {
+
+            function toArray (string) {
+                return string.trim("").split(' ');
+            };
+
+            this.contains = function (className) {
+                console.log(className);
+                return zp.inArray(toArray(node.getAttribute('class') || ''),className);
+            };
+
+            this.addClass = function (className) {
+                var
+                    currentClassList = toArray(node.getAttribute('class') || ''),
+                    update = false;
+
+                if(!zp.inArray(currentClassList,className)){
+                    currentClassList.push(className);
+                    update = true;
+                }
+                console.log(currentClassList.join(" "));
+                if(update){
+                    node.setAttribute("class" ,currentClassList.join(" "));
+                }
+                console.log(node.className);
+            }
+            return this;
         };
+
 
 
     document.addEventListener('DomContentLoaded', readyFunc, false);
@@ -475,7 +504,7 @@
             var result = false;
             this.each(function (node) {
                 if (node.classList) {
-                    result = node.classList.contains(className);
+                    result = new manipulateClass(node).contains(className);
                     if (result === true) {
                         return;
                     }
