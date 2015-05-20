@@ -6,7 +6,7 @@
 		<script type="text/javascript"  src="src/core/zp.js"></script>
         <script type="text/javascript"  src="src/plugins/ajax.js"></script>
         <script type="text/javascript"  src="src/plugins/dom.js"></script>
-        <script type="text/javascript"  src="jquery-2.1.3.js"></script>
+
 
     <body>
         <form id="test-form" class="form" attr="rrr">
@@ -21,7 +21,7 @@
                 var start = new Date().getTime();
                 var i;
                 for(i = 0; i < 1000000; i++){
-                     zp.dom('#test-form');
+                     new zp.dom('#test-form');
                 }
                 console.log(new Date().getTime() - start);
 

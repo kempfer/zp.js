@@ -1,9 +1,5 @@
-/**
- * @author zotov_mv
- * @see core/zp
- */
-
-;(function (zp,document) {
+;
+(function (zp, document) {
 
     "use strict";
 
@@ -12,9 +8,9 @@
 
         onReadyList = [],
 
-        regexpSelector = /^(?:#([\w-]+)|(\w+)|\.([\w-]+))$/,
+        regexpSelector = /^(?:#([\w\-]+)|(\w+)|\.([\w\-]+))$/,
 
-        ignoreCssPostfix =  {
+        ignoreCssPostfix = {
             zIndex: true,
             fontWeight: true,
             opacity: true,
@@ -26,8 +22,8 @@
          * @param {string} str
          * @returns {string}
          */
-        camelCase = function domCamelCase (str) {
-            return String(str).replace(/-\D/g, function(match){
+        camelCase = function DomCamelCase(str) {
+            return String(str).replace(/-\D/g, function (match) {
                 return match[1].toUpperCase();
             });
         },
@@ -36,8 +32,8 @@
          * @param {string} str
          * @returns {string}
          */
-        hyphenate = function domHyphenate (str) {
-            return String(str).replace(/[A-Z]/g, function(match){
+        hyphenate = function DomHyphenate(str) {
+            return String(str).replace(/[A-Z]/g, function (match) {
                 return '-' + match[0].toLowerCase();
             });
         },
@@ -45,109 +41,114 @@
         /**
          *
          */
-        readyFunc = function domReadyFunc () {
-            if(ready === true){
-                return;
+        readyFunc = function DomReadyFunc() {
+            var i = 0,
+                l = onReadyList.length;
+            if (ready === false) {
+                while (i < l) {
+                    if (zp.isFunction(onReadyList[i])) {
+                        onReadyList[i]();
+                    }
+                    i += 1;
+                }
+                onReadyList = [];
             }
             ready = true;
-            for(var i = 0; i < onReadyList.length; i++){
-                if(zp.isFunction(onReadyList[i])){
-                    onReadyList[i]();
-                }
-            }
-            onReadyList = [];
         },
         /**
          *
          * @param {Object} node
          * @param {Number} step
-         * @returns {dom}
+         * @returns {Dom}
          */
-        findParentByStep = function domFindParentByStep (node, step) {
-            if (step == null || step < 0){
+        findParentByStep = function DomFindParentByStep(node, step) {
+            if (zp.isUndefined(step) || step < 0) {
                 step = 1;
             }
-            if (!node || step <= 0 || !node.parentNode){
-                return new dom(node);
+            if (!node || step <= 0 || !node.parentNode) {
+                return new Dom(node);
             }
-            return findParentByStep(node.parentNode, step-1);
+            return findParentByStep(node.parentNode, step - 1);
         },
         /**
          *
-         * @param {dom} dom
+         * @param {Dom} Dom
          * @param {string} names
          * @param {string} action
          */
-        actionsClasses = function domActionsClasses(dom,names,action) {
-            var i,
-                classNames = (!zp.isArray(names)) ? [names] : names;
+        actionsClasses = function DomActionsClasses(dom, names, action) {
+            var i = 0,
+                classNames = !zp.isArray(names) ? [names] : names,
+                l = classNames.length;
             dom.each(function (node) {
-                for (i = 0;i < classNames.length; i++) {
+                while (i < l) {
                     if (node.classList) {
                         switch (action) {
                             case 'add':
                                 node.classList.add(classNames[i]);
-                            break;
+                                break;
                             case 'remove':
                                 node.classList.remove(classNames[i]);
-                            break;
+                                break;
                             case 'toggle':
                                 node.classList.toggle(classNames[i]);
-                            break;
+                                break;
                         }
                     }
+                    i += 1;
                 }
             });
         };
 
 
-    document.addEventListener('DOMContentLoaded', readyFunc, false);
-    window.addEventListener('load', readyFunc, false);
+    document.addEventListener('DomContentLoaded', readyFunc, false);
+    zp.globalScope.addEventListener('load', readyFunc, false);
 
 
     /**
      *
      * @constructor
-     * @this dom
+     * @this Dom
      * @param {String|Object} selector
      * @param {Object} [context]
-     * @returns {dom}
+     * @returns {Dom}
      */
-    var dom = function domConstructor (selector,context) {
-        if (! (this instanceof dom)) {
-            return new dom(selector,context);
+    var Dom = function DomConstructor(selector, context) {
+        var i = 0,
+            l;
+        if (this instanceof Dom) {
+            this.nodes =
+                zp.isUndefined(selector) ? [document] :
+                    zp.isString(selector) ? Dom.query(selector, context || document) :
+                        selector instanceof Dom ? zp.toArray(selector.nodes) :
+                            Dom.isElement(selector) ? [selector] :
+                                zp.isArray(selector) ? selector :
+                                    selector === window ? [document] :
+                                        [];
+            l = this.nodes.length;
+            //Hak
+            while (i < l) {
+                this[i] = this.nodes[i];
+                i += 1;
+            }
+            this.length = l;
+            return this;
+        }
+        else {
+            return new Dom(selector, context);
         }
 
-        this.nodes =
-            zp.isUndefined(selector)    ? [ document ] :
-            zp.isString(selector)       ? dom.query(selector,context || document) :
-            selector instanceof dom     ? zp.toArray(selector.nodes) :
-            dom.isElement(selector)     ? [ selector ] :
-            zp.isArray(selector)  		? selector :
-            selector === window         ? [ document ] :
-            [];
-        //Hak
-        var i = 0, l = this.nodes.length;
-        for(; i < l; i++){
-            this[i] = this.nodes[i];
-        }
-        return this;
+
     };
 
 
-    dom.prototype = {
+    Dom.prototype = {
 
         /**
          * @type {Function}
          */
-        constructor: dom,
+        constructor: Dom,
 
-        /**
-         * @type {Number}
-         */
-        get length () {
-            return this.nodes.length;
-        },
         /**
          * @type {Function}
          */
@@ -171,7 +172,7 @@
          *
          * @returns {Object|undefined}
          */
-        get first () {
+        get first() {
             return this.nodes[0];
         },
         /**
@@ -179,65 +180,66 @@
          * @returns {Object}
          */
         get size() {
-            var node, rect,
-                first = this.first;
+            var first = this.first,
+                node,
+                rect;
             node = (first === document) ? document.body : first;
-            console.log(!node)
-            if(!node || !node.getBoundingClientRect){
-                return {width : 0, height : 0};
+            if (!node || !node.getBoundingClientRect) {
+                return {width: 0, height: 0};
             }
             rect = node.getBoundingClientRect();
-            return {width : rect.width, height : rect.height};
+            return {width: rect.width, height: rect.height};
         },
         /**
          *
          * @returns {Object}
          */
         get offset() {
-            if (!dom.isElement(this.first)) {
-                return { x: 0, y: 0};
+            if (!Dom.isElement(this.first)) {
+                return {x: 0, y: 0};
             }
             var node = this.first;
             if (node.offsetX != null) {
-                return { x: node.offsetX, y: node.offsetY };
+                return {x: node.offsetX, y: node.offsetY};
             }
             try {
                 var box = node.getBoundingClientRect(),
-                    body    = document.body,
+                    body = document.body,
                     docElem = document.documentElement,
                     scrollLeft = window.pageXOffset || docElem.scrollLeft || body.scrollLeft,
-                    scrollTop  = window.pageYOffset || docElem.scrollTop  || body.scrollTop,
+                    scrollTop = window.pageYOffset || docElem.scrollTop || body.scrollTop,
                     clientLeft = docElem.clientLeft || body.clientLeft || 0,
-                    clientTop  = docElem.clientTop  || body.clientTop  || 0;
+                    clientTop = docElem.clientTop || body.clientTop || 0;
 
                 return {
                     x: Math.round(box.left + scrollLeft - clientLeft),
-                    y: Math.round(box.top  + scrollTop  - clientTop )
+                    y: Math.round(box.top + scrollTop - clientTop)
                 };
             }
-            catch(e){
-                return { x: 0, y: 0};
+            catch (e) {
+                return {x: 0, y: 0};
             }
         },
 
         /**
          *
          * @param {number} step
-         * @returns {dom}
+         * @returns {Dom}
          */
-        parent : function (step) {
-            return findParentByStep(this.first,step);
+        parent: function (step) {
+            return findParentByStep(this.first, step);
         },
 
         /**
          *
          * @param {Function} callback
          */
-        each : function (callback) {
+        each: function (callback) {
             var i = 0,
                 l = this.nodes.length;
-            for(; i < l; i++){
-                callback.call(this, this.nodes[i],i);
+            while (i < l) {
+                callback.call(this, this.nodes[i], i);
+                i += 1;
             }
             return this;
         },
@@ -246,12 +248,12 @@
          * @param {string} event
          * @param {Function} callback
          * @param {Boolean} [useCapture=false]
-         * @returns {dom}
+         * @returns {Dom}
          */
-        on: function (event,callback,useCapture) {
+        on: function (event, callback, useCapture) {
             var arrayEvents;
             this.each(function (node) {
-                if(node.addEventListener){
+                if (node.addEventListener) {
                     arrayEvents = event.split(" ");
                     arrayEvents.forEach(function (currentEvent) {
                         node.addEventListener(currentEvent, callback, useCapture);
@@ -265,12 +267,12 @@
          * @param {string} event
          * @param {Function} callback
          * @param {Boolean} [useCapture=false]
-         * @returns {dom}
+         * @returns {Dom}
          */
-        off: function (event,callback,useCapture) {
+        off: function (event, callback, useCapture) {
             var arrayEvents;
             this.each(function (node) {
-                if(node.removeEventListener){
+                if (node.removeEventListener) {
                     arrayEvents = event.split(" ");
                     arrayEvents.forEach(function (currentEvent) {
                         node.removeEventListener(currentEvent, callback, useCapture);
@@ -282,11 +284,11 @@
         /**
          *
          * @param {string} attrName
-         * @returns {dom}
+         * @returns {Dom}
          */
-        reomveAttr : function (attrName) {
+        reomveAttr: function (attrName) {
             this.each(function (node) {
-                if(node.removeAttribute){
+                if (node.removeAttribute) {
                     node.removeAttribute(attrName);
                 }
             });
@@ -296,21 +298,21 @@
         /**
          *
          * @param [deep=true]
-         * @returns {dom}
+         * @returns {Dom}
          */
-        clone : function (deep) {
+        clone: function (deep) {
             var clones = [],
                 deep = zp.isUndefined(deep) ? true : false;
             this.each(function (node) {
-                if (zp.dom.isElement(node)) {
+                if (zp.Dom.isElement(node)) {
                     clones.push(node.cloneNode(deep));
                 }
             });
-            return new dom(clones);
+            return new Dom(clones);
         },
         /**
          *
-         * @returns {dom}
+         * @returns {Dom}
          */
         remove: function () {
             this.each(function (node) {
@@ -322,9 +324,9 @@
         },
         /**
          *
-         * @returns {dom}
+         * @returns {Dom}
          */
-        empty : function () {
+        empty: function () {
             this.each(function (node) {
                 if (node.removeChild) {
                     while (node.hasChildNodes()) {
@@ -337,28 +339,28 @@
         /**
          *
          * @param selector
-         * @returns {dom}
+         * @returns {Dom}
          */
-        find : function (selector) {
-            var result = [],found;
+        find: function (selector) {
+            var result = [], found;
             this.each(function (node) {
-                found = dom.query(selector,node);
+                found = Dom.query(selector, node);
                 found.forEach(function (el) {
                     result.push(el);
                 });
             });
-            return new dom(result);
+            return new Dom(result);
         },
         /**
          *
          * @param node
-         * @returns {dom}
+         * @returns {Dom}
          */
-        append : function (node) {
-            var el = (node instanceof dom) ? node : new dom(node),
+        append: function (node) {
+            var el = (node instanceof Dom) ? node : new Dom(node),
                 first = this.first,
                 fr = document.createDocumentFragment();
-            if(first.appendChild){
+            if (first.appendChild) {
                 el.each(function (node) {
                     fr.appendChild(node);
                 });
@@ -370,22 +372,22 @@
          *
          * @param string [key]
          * @param {number|string} [value]
-         * @returns {dom}
+         * @returns {Dom}
          */
-        css : zp.accessor({
-            get : function domGetCss (property) {
-                if (dom.isElement(this.first)) {
+        css: zp.accessor({
+            get: function DomGetCss(property) {
+                if (Dom.isElement(this.first)) {
                     return window.getComputedStyle(this.first, "").getPropertyValue(hyphenate(property));
                 }
                 return;
             },
-            set : function domSetCss (property,value) {
+            set: function DomSetCss(property, value) {
                 if (zp.isNumber(value) && !ignoreCssPostfix[property]) {
                     value += 'px';
                 }
                 this.each(function (node) {
-                    if(node.style){
-                        node.style[camelCase(property)] =  value;
+                    if (node.style) {
+                        node.style[camelCase(property)] = value;
                     }
                 });
                 return this;
@@ -397,18 +399,18 @@
          *
          * @param {string} key
          * @param {string} [val]
-         * @returns {string|dom}
+         * @returns {string|Dom}
          */
         attr: zp.accessor({
-            get : function domGetAttr (property) {
-                if(this.first.getAttribute){
+            get: function DomGetAttr(property) {
+                if (this.first.getAttribute) {
                     return this.first.getAttribute(property);
                 }
             },
-            set : function domSetAttr (property,value) {
+            set: function DomSetAttr(property, value) {
                 this.each(function (node) {
-                    if(node.setAttribute){
-                        node.setAttribute(property,value);
+                    if (node.setAttribute) {
+                        node.setAttribute(property, value);
                     }
                 });
                 return this;
@@ -418,14 +420,14 @@
         /**
          *
          * @param {string} val
-         * @returns {dom|string}
+         * @returns {Dom|string}
          */
-        html : function (val) {
-            if(arguments.length > 0){
+        html: function (val) {
+            if (arguments.length > 0) {
                 this.first.innerHTML = val;
                 return this;
             }
-            else{
+            else {
                 return this.first.innerHTML;
             }
         },
@@ -433,15 +435,15 @@
         /**
          *
          * @param {string} text
-         * @returns {dom|string}
+         * @returns {Dom|string}
          */
-        text : function (text) {
+        text: function (text) {
             var property = document.body.innerText == null ? 'textContent' : 'innerText';
-            if(arguments.length > 0){
+            if (arguments.length > 0) {
                 this.first[property] = text;
                 return this;
             }
-            else{
+            else {
                 return this.first[property];
             }
         },
@@ -449,19 +451,19 @@
         /**
          *
          * @param [String|Array] className
-         * @returns {dom}
+         * @returns {Dom}
          */
         addClass: function (className) {
-            actionsClasses(this,className, 'add');
+            actionsClasses(this, className, 'add');
             return this;
         },
         /**
          *
          * @param [String|Array] className
-         * @returns {dom}
+         * @returns {Dom}
          */
         removeClass: function (className) {
-            actionsClasses(this,className, 'remove');
+            actionsClasses(this, className, 'remove');
             return this;
         },
 
@@ -470,7 +472,7 @@
          * @param {string} className
          * @returns {boolean}
          */
-        hasClass : function (className) {
+        hasClass: function (className) {
             var result = false;
             this.each(function (node) {
                 if (node.classList) {
@@ -486,13 +488,12 @@
         /**
          *
          * @param [String|Array] className
-         * @returns {dom}
+         * @returns {Dom}
          */
         toggleClass: function (className) {
-            actionsClasses(this,className, 'toggle');
+            actionsClasses(this, className, 'toggle');
             return this;
         },
-
 
 
         /**
@@ -500,7 +501,7 @@
          * @returns {Array.<*>}
          */
         toArray: function () {
-            return zp.toArray( this.nodes );
+            return zp.toArray(this.nodes);
         }
     };
 
@@ -511,7 +512,7 @@
      * @param {object} node
      * @returns {boolean}
      */
-    dom.isElement = function domIsElement (node) {
+    Dom.isElement = function DomIsElement(node) {
         return (node && node.nodeName) ? true : false;
     };
 
@@ -520,14 +521,14 @@
      * @param {Function} callback
      * @throws {TypeError} callback is function
      */
-    dom.onReady = function domOnReady (callback) {
-        if(!zp.isFunction(callback)){
+    Dom.onReady = function DomOnReady(callback) {
+        if (!zp.isFunction(callback)) {
             throw new TypeError("callback is not a function");
         }
-        if(ready){
-            setTimeout(callback,1);
+        if (ready) {
+            setTimeout(callback, 1);
         }
-        else{
+        else {
             onReadyList.push(callback);
         }
     };
@@ -538,24 +539,24 @@
      * @param {Object} [context]
      * @returns {Object[]}
      */
-    dom.query = function (selector,context) {
+    Dom.query = function (selector, context) {
         var match = regexpSelector.exec(selector),
-            result = [];
+            result = [],
+            push = [].push;
         context = context || document;
-        if(match){
-            if(match[1]){
+        if (match) {
+            if (match[1]) {
                 result = [context.getElementById ? context.getElementById(match[1]) : document.getElementById(match[1])];
             }
             else if (match[2]) {
-                [].push.apply(result,context.getElementsByTagName(selector));
+                push.apply(result, context.getElementsByTagName(selector));
             }
-            else if (match[3] ) {
-                [].push.apply(result,context.getElementsByClassName(match[3]));
+            else if (match[3]) {
+                push.apply(result, context.getElementsByClassName(match[3]));
             }
         }
-        else{
-
-            [].push.apply(result,context.querySelectorAll(selector));
+        else {
+            push.apply(result, context.querySelectorAll(selector));
         }
         return result;
 
@@ -565,11 +566,11 @@
      *
      * @param {string} tagName
      * @param {Object} [attr]
-     * @returns {dom}
+     * @returns {Dom}
      */
-    dom.create = function (tagName, attr) {
-        var node = new dom(document.createElement(tagName));
-        if (attr){
+    Dom.create = function (tagName, attr) {
+        var node = new Dom(document.createElement(tagName));
+        if (attr) {
             node.attr(attr);
         }
         return node;
@@ -580,8 +581,8 @@
      * @param {Object} [context]
      * @returns {boolean}
      */
-    dom.is = function (selector,context) {
-        var node = new dom(selector,context);
+    Dom.is = function (selector, context) {
+        var node = new Dom(selector, context);
         return node.length > 0;
     };
 
@@ -589,17 +590,17 @@
      *
      * @returns {Number}
      */
-    dom.height = function () {
-        return window.innerHeight;
+    Dom.height = function () {
+        return zp.globalScope.innerHeight;
     };
     /**
      *
      * @returns {Number}
      */
-    dom.width = function () {
-        return window.innerWidth;
+    Dom.width = function () {
+        return zp.globalScope.innerWidth;
     };
 
-    zp.extend('dom', dom);
+    zp.extend('dom', Dom);
 
-})(zp,document) ;
+}(zp, document));
