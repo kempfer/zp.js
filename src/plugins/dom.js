@@ -77,58 +77,84 @@
          * @param {string} action
          */
         actionsClasses = function domActionsClasses(dom, names, action) {
-            var i = 0,
-                classNames = !zp.isArray(names) ? [names] : names,
-                l = classNames.length;
             dom.each(function (node) {
-                while (i < l) {
-                    switch (action) {
-                        case 'add':
-                            new manipulateClass(node).addClass(classNames[i]);
-                            //node.classList.add(classNames[i]);
-                            break;
-                        case 'remove':
-                            node.classList.remove(classNames[i]);
-                            break;
-                        case 'toggle':
-                            node.classList.toggle(classNames[i]);
-                            break;
-                    }
-                    i += 1;
-                }
+                new manipulateClass(node)[action](names);
             });
         },
 
+        /**
+         *
+         * @param {Object} node
+         * @returns {domManipulateClass}
+         */
         manipulateClass = function domManipulateClass (node) {
 
+            var currentClassList = toArray(node.getAttribute('class') || '');
+
             function toArray (string) {
-                return string.trim("").split(' ');
-            };
+                return string.trim().split(' ');
+            }
+
+            function _update () {
+                node.setAttribute("class" ,currentClassList.join(" ").trim());
+            }
 
             this.contains = function (className) {
-                console.log(className);
-                return zp.inArray(toArray(node.getAttribute('class') || ''),className);
+                return zp.inArray(currentClassList,className);
             };
 
-            this.addClass = function (className) {
-                var
-                    currentClassList = toArray(node.getAttribute('class') || ''),
-                    update = false;
+            this.add = function (className) {
+                var update = false,
+                    classListArray = zp.isArray(className) ? className : toArray(className),
+                    i = 0,
+                    l = classListArray.length,
+                    name;
 
-                if(!zp.inArray(currentClassList,className)){
-                    currentClassList.push(className);
-                    update = true;
+                do {
+                    name = classListArray[i] + "";
+                    if(!this.contains(name)){
+                        currentClassList.push(name);
+                        update = true;
+                    }
                 }
-                console.log(currentClassList.join(" "));
+                while(++i < l);
                 if(update){
-                    node.setAttribute("class" ,currentClassList.join(" "));
+                    _update();
                 }
-                console.log(node.className);
-            }
+            };
+            this.remove = function (className) {
+                var update = false,
+                    classListArray = zp.isArray(className) ? className : toArray(className),
+                    i = 0,
+                    l = classListArray.length,
+                    name,
+                    index;
+
+                do {
+                    name = classListArray[i] + "";
+                    index = currentClassList.indexOf(name);
+                    if(index !== -1) {
+                        currentClassList.splice(index,1);
+                        update = true;
+                    }
+                }
+                while(++i < l);
+
+                if(update) {
+                    _update();
+                }
+
+            };
+            this.toggle = function (className) {
+                if(this.contains(className)){
+                    this.remove(className);
+                }
+                else{
+                    this.add(className);
+                }
+            };
             return this;
         };
-
-
 
     document.addEventListener('DomContentLoaded', readyFunc, false);
     zp.globalScope.addEventListener('load', readyFunc, false);
@@ -503,11 +529,9 @@
         hasClass: function (className) {
             var result = false;
             this.each(function (node) {
-                if (node.classList) {
-                    result = new manipulateClass(node).contains(className);
-                    if (result === true) {
-                        return;
-                    }
+                result = new manipulateClass(node).contains(className);
+                if (result === true) {
+                    return;
                 }
             });
             return result;
