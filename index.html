@@ -3,14 +3,18 @@
 	<head>
 		<meta charset="utf-8">
 		<title>Zp lib</title>
-		<script type="text/javascript"  src="core/zp.js"></script>
-        <script type="text/javascript"  src="plugins/ajax.js"></script>
-        <script type="text/javascript"  src="plugins/dom.js"></script>
+		<script type="text/javascript"  src="src/core/zp.js"></script>
+        <script type="text/javascript"  src="src/plugins/ajax.js"></script>
+        <script type="text/javascript"  src="src/plugins/dom.js"></script>
+
+
     <body>
-        <form id="test-form">
-            <input type="hidden" name="test" value="123">
+        <form id="test-form" class="form" attr="rrr">
+            <input type="text" name="test" value="123">
         </form>
+        <input type="text" name="test2" id="test-input" value="123">
 		<script>
+<<<<<<< HEAD
 		console.log(zp);
        // var formData = new FormData(document.getElementById('test-form'));
         var ajaxMy = zp.ajax({
@@ -35,6 +39,24 @@
         })();
 
        //ajaxMy.abort();
+=======
+            zp.dom.onReady(function () {
+
+
+
+                var start = new Date().getTime();
+                var i;
+                for(i = 0; i < 1000000; i++){
+                     new zp.dom('#test-form').addClass('new-class');
+                }
+                console.log(new Date().getTime() - start);
+
+
+
+
+
+            });
+>>>>>>> feature/plugin_dom
 		</script>
 	</body>
 </html>
