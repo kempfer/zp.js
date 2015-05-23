@@ -539,7 +539,7 @@
 
         /**
          *
-         * @param [String|Array] className
+         * @param {String} className
          * @returns {Dom}
          */
         toggleClass: function (className) {

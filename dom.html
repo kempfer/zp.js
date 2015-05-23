@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Zp lib</title>
+    <script type="text/javascript"  src="src/core/zp.js"></script>
+    <script type="text/javascript"  src="src/plugins/ajax.js"></script>
+    <script type="text/javascript"  src="src/plugins/dom.js"></script>
+
+
+<body>
+
+<script>
+    zp.dom.onReady(function () {
+
+        //create element
+        var form = zp.dom.create('form').addClass('form');
+
+        //append
+        zp.dom('body').append(form);
+
+        form.append(zp.dom.create('input', { type : 'text', id : 'input-' + zp.uniqueId()}))
+            .append(zp.dom.create('input', { type : 'text', id : 'input-' + zp.uniqueId()}));
+
+        form.find('input')
+                .addClass('input-text')
+                .css('width',200)
+                .css({
+                    'height': 40,
+                    'padding-left' : 10,
+                    'display' : 'block',
+                    'margin' : 5
+                })
+                .attr('placeholder', 'Enter Text')
+
+
+
+        zp.dom('#test-form').find('input').on('change', function (e) {
+            console.log(e);
+            console.log(this.value);
+        });
+    });
+</script>
+</body>
+</html>
