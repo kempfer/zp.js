@@ -6,57 +6,6 @@
 		<script type="text/javascript"  src="src/core/zp.js"></script>
         <script type="text/javascript"  src="src/plugins/ajax.js"></script>
         <script type="text/javascript"  src="src/plugins/dom.js"></script>
-
-
     <body>
-        <form id="test-form" class="form" attr="rrr">
-            <input type="text" name="test" value="123">
-        </form>
-        <input type="text" name="test2" id="test-input" value="123">
-		<script>
-<<<<<<< HEAD
-		console.log(zp);
-       // var formData = new FormData(document.getElementById('test-form'));
-        var ajaxMy = zp.ajax({
-            url : 'index.php',
-            method: 'post',
-            responseType : 'json',
-            data : {test : 123},
-            onLoad : function (result,xhr,e) {
-                console.log(result);
-            },
-            onAbort : function (e) {
-                console.log('onAbort');
-            },
-            onError : function (result,xhr,e) {
-                console.log('Error');
-            }
-        });
-        ;(function () {
-
-            "use strict";
-
-        })();
-
-       //ajaxMy.abort();
-=======
-            zp.dom.onReady(function () {
-
-
-
-                var start = new Date().getTime();
-                var i;
-                for(i = 0; i < 1000000; i++){
-                     new zp.dom('#test-form').addClass('new-class');
-                }
-                console.log(new Date().getTime() - start);
-
-
-
-
-
-            });
->>>>>>> feature/plugin_dom
-		</script>
 	</body>
 </html>
