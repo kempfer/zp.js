@@ -1,87 +1,11 @@
 <!DOCTYPE html>
 <html>
-	<head>
-		<meta charset="utf-8">
-		<title>Zp lib</title>
-		<script type="text/javascript"  src="src/core/zp.js"></script>
-        <script type="text/javascript"  src="src/plugins/ajax.js"></script>
-        <script type="text/javascript"  src="src/plugins/dom.js"></script>
-        <script type="text/javascript"  src="src/plugins/class.js"></script>
-    <body>
-        <form id="test-form">
-            <input type="hidden" name="test" value="123">
-        </form>
-		<script>
-            var test;
-            var onReady = false;
-            function readyFunc () {
-                if(onReady){
-                    return;
-                }
-                onReady =  true;
-                zp.define('zp.classes.animal',{
-                    init : function (type,name) {
-                        console.log('animal Init');
-                        this.type = type;
-                        this.name = name;
-                    },
-                    getType : function  (){
-                        return this.type;
-                    },
-                    getName : function () {
-                        return this.name;
-                    }
-                });
-
-
-                var dog = zp.create({
-                    extend : zp.classes.animal,
-                    init : function (type,name) {
-                        console.log('dog init');
-                        return this.callParent('init',type,name);
-                    },
-                    getType : function () {
-                        return this.callParent('getType');
-                    },
-                    getName : function () {
-                        return this.callParent('getName');
-                    },
-                    name : 'dog'
-                });
-
-
-               //var test2 =  new animal();
-                //console.log(test2.getType())
-                // f
-                // o();
-                var i = 0;
-                var dog2;
-                var start = new Date().getTime();
-
-                    dog2 =  zp.create({
-                    extend : dog,
-                         init : function (type,name) {
-                             console.log('dog2 init');
-                             return this.callParent('init',type,name);
-                         },
-                         name : 'dog2'
-                    });
-                var dog3 =  zp.create({
-                    extend : dog2,
-                    init : function (type,name) {
-                        console.log('dog3 init');
-                        return this.callParent('init',type,name);
-                    },
-                    name : 'dog3'
-                });
-
-                console.log((new Date().getTime() - start)/1000);
-                test =  new dog3('dog', 'dog name');
-                console.log(test instanceof zp.classes.animal);
-
-            }
-            document.addEventListener('DOMContentLoaded', readyFunc, false);
-            window.addEventListener('load', readyFunc, false);
-		</script>
-	</body>
+<head>
+    <meta charset="utf-8">
+    <title>Zp lib</title>
+    <script type="text/javascript"  src="src/core/zp.js"></script>
+    <script type="text/javascript"  src="src/plugins/ajax.js"></script>
+    <script type="text/javascript"  src="src/plugins/dom.js"></script>
+<body>
+</body>
 </html>
