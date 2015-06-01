@@ -171,6 +171,22 @@
             return validatable;
         },
 
+        /**
+         *
+         * @param {String|Number|Array} v
+         * @returns {Number}
+         */
+        getSize = function getSize (v) {
+            var size;
+            if (zp.isNumber(v)) {
+                size = v;
+            }
+            else if (zp.isArray(v) || zp.isString(v)) {
+                size = v.length;
+            }
+            return size;
+        },
+
 
         ruleMethods = {
 
@@ -256,6 +272,71 @@
              */
             url : function validateUrl (attributes,name) {
                 return regexs.url.test(attributes[name]);
+            },
+            /**
+             *
+             * @param {Object} attributes
+             * @param {String} name
+             * @param {Array} parameters
+             * @returns {boolean}
+             */
+            'in' : function validateIN (attributes,name,parameters) {
+                return zp.inArray(parameters,attributes[name]);
+            },
+            /**
+             *
+             * @param {Object} attributes
+             * @param {String} name
+             * @param {Array} parameters
+             * @returns {boolean}
+             */
+            notIn : function validateNotIN (attributes,name,parameters) {
+                return !zp.inArray(parameters,attributes[name]);
+            },
+            /**
+             *
+             * @param {Object} attributes
+             * @param {String} name
+             * @param {Array} parameters
+             * @returns {boolean}
+             */
+            confirmed : function validateConfirmed (attributes,name,parameters) {
+                var other = attributes[parameters[0]];
+                return !zp.isUndefined(other) && other == attributes[name];
+            },
+
+            /**
+             *
+             * @param {Object} attributes
+             * @param {String} name
+             * @param {Array} parameters
+             * @returns {boolean}
+             */
+            max : function validateMax (attributes,name,parameters) {
+                return getSize(attributes[name]) <= parameters[0];
+            },
+
+            /**
+             *
+             * @param {Object} attributes
+             * @param {String} name
+             * @param {Array} parameters
+             * @returns {boolean}
+             */
+            min : function validateMin (attributes,name,parameters) {
+                return getSize(attributes[name]) >= parameters[0];
+            },
+
+            /**
+             *
+             * @param {Object} attributes
+             * @param {String} name
+             * @param {Array} parameters
+             * @returns {boolean}
+             */
+            between : function validateBetween (attributes,name,parameters) {
+                var size =  getSize(attributes[name]);
+                return size >= parameters[0] && size <= parameters[1];
             }
         },
 
