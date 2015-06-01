@@ -278,7 +278,7 @@
 
             this.rules = explodeRules(rules);
             this.attributes = data;
-            this.result = {};
+            this.result = {passed: true, errorKeys : {},  countError: 0};
             this.messages = messages;
             this.completed = false;
             return this;
@@ -358,7 +358,6 @@
                 ruleList,
                 validatable,
                 i = 0;
-            this.result = {passed: true, errorKeys : {},  countError: 0};
             for (key in this.rules) {
                 ruleList = this.rules[key];
                 validatable = isValidatable(ruleList);
@@ -375,7 +374,20 @@
          * @returns {Array}
          */
         getErrors: function () {
-            return this.errors;
+            var
+                key,
+                errorKeys,
+                i = 0,
+                errors = [];
+            for(key in this.result.errorKeys){
+                errorKeys = this.result.errorKeys[key];
+                while ( i < errorKeys.length) {
+                    errors.push(errorKeys[i].message);
+                    i += 1;
+                }
+            }
+
+            return errors;
         },
 
         /**
@@ -385,8 +397,7 @@
          * @param {Array} [parameters]
          */
         addError : function (dataKey, ruleName, parameters) {
-            this.passes();
-            if(zp.isUndefined(this.result.errorKeys[dataKey])){
+            if (zp.isUndefined(this.result.errorKeys[dataKey])) {
                 this.result.errorKeys[dataKey] = [];
             }
             this.result.errorKeys[dataKey].push({
