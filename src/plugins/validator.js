@@ -20,6 +20,22 @@
             url: /^((http|https):\/\/(\w+:{0,1}\w*@)?(\S+)|)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?$/
         },
 
+
+        messageList = {
+            email: '{attribute} is not a valid email address.',
+            required: '{attribute} cannot be blank.',
+            url: '{attribute} is not a valid URL.',
+            ip: '{attribute} is not a valid ip.',
+            integer: '{attribute} must be an integer.',
+            alpha: '{attribute} must be an alpha.',
+            alphaNumeric: '{attribute} must be an alphaNumeric.',
+            numeric: '{attribute} must be an numeric.'
+        },
+
+        /**
+         *
+         * @type {string[]}
+         */
         implicitRules = ['required'],
 
         /**
@@ -39,7 +55,47 @@
                     if (zp.isString(rule)) {
                         listRules[key] = parseStringRule(rule);
                     }
+                    else{
+                        listRules[key] = parseRule(rule);
+                    }
                 }
+            }
+            return listRules;
+        },
+        /**
+         *
+         * @param {Object|Array} rules
+         * @returns {Object}
+         */
+        parseRule = function validatorParseRule (rules) {
+            var rule,
+                parseRule,
+                i = 0,
+                listRules = [];
+            if(zp.isObject(rules)){
+                return rules;
+            }
+            else if(zp.isArray(rules)){
+                while (i < rules.length) {
+                    rule = rules[i];
+                    if(zp.isObject(rule)){
+                        listRules.push(rule);
+                    }
+                    else if(zp.isString(rule)){
+                        parseRule = rule.split(':');
+                        listRules.push({
+                            name: parseRule[0],
+                            parameters : parseParameters(parseRule[1])
+                        });
+                    }
+                    else{
+                        throw new Error('wrong format rule');
+                    }
+                    i += 1;
+                }
+            }
+            else{
+                throw new Error('wrong format rule');
             }
             return listRules;
         },
@@ -81,22 +137,40 @@
             }
         },
 
-        prepareMessage = function validatorPrepareMessage () {
+        /**
+         *
+         * @param {String} name
+         * @param {String} rule
+         * @param {Array} params
+         * @returns {String}
+         */
+        prepareMessage = function validatorPrepareMessage (name, rule, params) {
+            var
+                message = messageList[rule] || '';
+            message = message.replace('{attribute}', name);
+            return message;
 
         },
 
         /**
          *
-         * @param {String} rule
-         * @param {Object} data
-         * @param {String} name
+         * @param {Array} rules
          * @returns {boolean}
          */
-        isValidatable = function validatorIsValidatable (rule, data, name) {
-            if(zp.inArray(implicitRules)){
-
+        isValidatable = function validatorIsValidatable (rules) {
+            var
+                validatable = false,
+                i = rules.length;
+            while (i) {
+                i -= 1;
+                if(zp.inArray(implicitRules, rules[i].name)){
+                    validatable = true;
+                    continue;
+                }
             }
+            return validatable;
         },
+
 
         ruleMethods = {
 
@@ -118,9 +192,7 @@
              * @returns {boolean}
              */
             email : function validateEmail (attributes,name){
-                if(attributes[name]){
-                    return regexs.email.test(attributes[name]);
-                }
+                return regexs.email.test(attributes[name]);
             },
             /**
              *
@@ -205,10 +277,10 @@
             }
 
             this.rules = explodeRules(rules);
-            this.data = data;
+            this.attributes = data;
             this.result = {};
-            this.errors = [];
             this.messages = messages;
+            this.completed = false;
             return this;
         };
 
@@ -224,7 +296,7 @@
          *
          * @type {Object}
          */
-        data: {},
+        attributes: {},
 
         /**
          *
@@ -251,10 +323,29 @@
          * @returns {boolean}
          */
         passes: function () {
-            if(zp.isEmpty(this.result)){
+            if(!this.completed){
                 this.validated();
             }
             return this.result.passed;
+        },
+
+        /**
+         *
+         * @param {String} key
+         * @param {Object} rule
+         * @param {boolean} validatable
+         * @private
+         */
+        _validateRule : function (dataKey,rule,validatable) {
+
+            if (ruleMethods[rule.name]) {
+                if (validatable && !ruleMethods[rule.name](this.attributes,dataKey,rule.parameters)) {
+                    this.addError(dataKey,rule.name,rule.parameters);
+                }
+            }
+            else{
+                throw new Error('not known rule validation: ' + rule.name);
+            }
         },
 
         /**
@@ -265,26 +356,19 @@
             var
                 key,
                 ruleList,
-                rule,
-                result = {passed : true, errorKeys: {}, countError: 0},
+                validatable,
                 i = 0;
+            this.result = {passed: true, errorKeys : {},  countError: 0};
             for (key in this.rules) {
                 ruleList = this.rules[key];
+                validatable = isValidatable(ruleList);
                 while (i < ruleList.length) {
-                    rule = ruleList[i];
-                    if (ruleMethods[rule.name]) {
-                        if (!ruleMethods[rule.name](this.attributes,key,rule.parameters)) {
-                            if(!zp.isArray(result.errorKeys[key])){
-                                result.errorKeys[key] = [];
-                                result.errorKeys[key].push(rule.name);
-                                result.validate = false;
-                                result.countError += 1;
-                            }
-                        }
-                    }
+                    this._validateRule(key,ruleList[i],validatable);
                     i += 1;
                 }
             }
+            this.completed = true;
+            return this.result;
         },
         /**
          *
@@ -292,6 +376,26 @@
          */
         getErrors: function () {
             return this.errors;
+        },
+
+        /**
+         *
+         * @param {String} dataKey
+         * @param {String} ruleName
+         * @param {Array} [parameters]
+         */
+        addError : function (dataKey, ruleName, parameters) {
+            this.passes();
+            if(zp.isUndefined(this.result.errorKeys[dataKey])){
+                this.result.errorKeys[dataKey] = [];
+            }
+            this.result.errorKeys[dataKey].push({
+                rule: ruleName,
+                message: prepareMessage(dataKey,ruleName,parameters)
+            });
+            this.result.passed = false;
+            this.result.countError += 1;
+            return this;
         }
 
     };
