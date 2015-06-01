@@ -46,7 +46,7 @@ QUnit.test( "Parse Rules", function( assert ) {
     assert.ok( valid.rules.email[1].parameters.length === 1, "valid.rules.email[1].parameters.length === 1" );
     assert.ok( valid.rules.email[1].parameters[0] === 1, "valid.rules.email[1].parameters[0] === '1'" );
 
-    zp.validator({ email : 'Maxim'}, {email : [ {name : 'required', parameters: [1]} , {name : 'email', parameters: [1]}]});
+    valid = zp.validator({ email : 'Maxim'}, {email : [ {name : 'required', parameters: []} , {name : 'email', parameters: [1]}]});
 
     assert.ok( zp.isObject(valid.rules), "zp.isObject(valid.rules)" );
     assert.ok( zp.isArray(valid.rules.email), "zp.isArray(valid.rules.email)" );
