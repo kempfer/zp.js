@@ -393,6 +393,44 @@
 
         /**
          *
+         * @param {String} key
+         * @param {Object} rule
+         * @param {boolean} validatable
+         * @private
+         */
+        _validateRule : function (dataKey,rule,validatable) {
+
+            if (ruleMethods[rule.name]) {
+                if (validatable && !ruleMethods[rule.name](this.attributes,dataKey,rule.parameters)) {
+                    this._addError(dataKey,rule.name,rule.parameters);
+                }
+            }
+            else{
+                throw new Error('not known rule validation: ' + rule.name);
+            }
+        },
+        /**
+         *
+         * @param {String} dataKey
+         * @param {String} ruleName
+         * @param {Array} [parameters]
+         * @private
+         */
+        _addError : function (dataKey, ruleName, parameters) {
+            if (zp.isUndefined(this.result.errorKeys[dataKey])) {
+                this.result.errorKeys[dataKey] = [];
+            }
+            this.result.errorKeys[dataKey].push({
+                rule: ruleName,
+                message: prepareMessage(dataKey,ruleName,parameters)
+            });
+            this.result.passed = false;
+            this.result.countError += 1;
+            return this;
+        },
+
+        /**
+         *
          * @returns {boolean}
          */
         fails: function () {
@@ -408,25 +446,6 @@
                 this.validated();
             }
             return this.result.passed;
-        },
-
-        /**
-         *
-         * @param {String} key
-         * @param {Object} rule
-         * @param {boolean} validatable
-         * @private
-         */
-        _validateRule : function (dataKey,rule,validatable) {
-
-            if (ruleMethods[rule.name]) {
-                if (validatable && !ruleMethods[rule.name](this.attributes,dataKey,rule.parameters)) {
-                    this.addError(dataKey,rule.name,rule.parameters);
-                }
-            }
-            else{
-                throw new Error('not known rule validation: ' + rule.name);
-            }
         },
 
         /**
@@ -450,6 +469,7 @@
             this.completed = true;
             return this.result;
         },
+
         /**
          *
          * @returns {Array}
@@ -458,42 +478,37 @@
             var
                 key,
                 errorKeys,
+                error,
                 i = 0,
                 errors = [];
             for(key in this.result.errorKeys){
                 errorKeys = this.result.errorKeys[key];
+                error = { name: key,  message: []};
                 while ( i < errorKeys.length) {
-                    errors.push(errorKeys[i].message);
+                    error.message.push(errorKeys[i].message);
                     i += 1;
                 }
+                errors.push(error);
             }
-
             return errors;
         },
 
         /**
          *
-         * @param {String} dataKey
-         * @param {String} ruleName
-         * @param {Array} [parameters]
+         * @param {string} key
+         * @returns {Array}
          */
-        addError : function (dataKey, ruleName, parameters) {
-            if (zp.isUndefined(this.result.errorKeys[dataKey])) {
-                this.result.errorKeys[dataKey] = [];
+        getError : function (key) {
+            var
+                i = 0,
+                errorKeys = this.result.errorKeys[key] || [],
+                error = [];
+            while ( i < errorKeys.length) {
+                error.push(errorKeys[i].message);
+                i += 1;
             }
-            this.result.errorKeys[dataKey].push({
-                rule: ruleName,
-                message: prepareMessage(dataKey,ruleName,parameters)
-            });
-            this.result.passed = false;
-            this.result.countError += 1;
-            return this;
+            return error;
         }
-
     };
-
-
     zp.extend('validator', Validator);
-
-
 }(zp));
