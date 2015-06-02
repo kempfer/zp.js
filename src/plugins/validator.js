@@ -12,12 +12,11 @@
             alpha: /^[a-z]+$/i,
             alphaNumeric: /^[a-z0-9]+$/i,
             alphaDash: /^[a-z0-9_\-]+$/i,
-            numeric: /^[0-9]+$/,
             numericDash: /^[\d\-\s]+$/,
             integer: /^\-?[0-9]+$/,
             email: /^[a-zA-Z0-9!#$%&\'*+\\/=?^_`{|}~-]+(?:\.[a-zA-Z0-9!#$%&\'*+\\/=?^_`{|}~-]+)*@(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$/,
             ip: /^((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})\.){3}(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})$/i,
-            url: /^((http|https):\/\/(\w+:{0,1}\w*@)?(\S+)|)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?$/
+            url: /^((http|https):\/\/(([A-Z0-9][A-Z0-9_-]*)(\.[A-Z0-9][A-Z0-9_-]*)+))/i
         },
 
 
@@ -234,7 +233,7 @@
              * @returns {boolean}
              */
             alphaNumeric : function validateAlphaNumeric (attributes,name) {
-                return regexs.alpha.test(attributes[name]);
+                return regexs.alphaNumeric.test(attributes[name]);
             },
             /**
              *
@@ -243,7 +242,7 @@
              * @returns {boolean}
              */
             alphaDash : function validateAlphaDash(attributes,name) {
-                return regexs.alpha.test(attributes[name]);
+                return regexs.alphaDash.test(attributes[name]);
             },
             /**
              *
@@ -252,7 +251,17 @@
              * @returns {boolean}
              */
             numeric : function validateNumeric (attributes,name) {
-                return regexs.numeric.test(attributes[name]);
+                return !isNaN(Number(attributes[name]));
+            },
+
+            /**
+             *
+             * @param {Object} attributes
+             * @param {String} name
+             * @returns {boolean}
+             */
+            numericDash : function validateNumeric (attributes,name) {
+                return regexs.numericDash.test(attributes[name]);
             },
             /**
              *
