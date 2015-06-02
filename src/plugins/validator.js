@@ -155,19 +155,27 @@
         /**
          *
          * @param {Array} rules
+         * @param {Object} attributes
+         * @param {String} key
          * @returns {boolean}
          */
-        isValidatable = function validatorIsValidatable (rules) {
+        isValidatable = function validatorIsValidatable (rules, attributes, key) {
             var
                 validatable = false,
                 i = rules.length;
-            while (i) {
-                i -= 1;
-                if(zp.inArray(implicitRules, rules[i].name)){
-                    validatable = true;
-                    continue;
+            if(zp.isUndefined(attributes[key])){
+                while (i) {
+                    i -= 1;
+                    if(zp.inArray(implicitRules, rules[i].name)){
+                        validatable = true;
+                        continue;
+                    }
                 }
             }
+            else{
+                validatable = true;
+            }
+
             return validatable;
         },
 
@@ -208,6 +216,7 @@
              * @returns {boolean}
              */
             email : function validateEmail (attributes,name){
+                console.log(attributes);
                 return regexs.email.test(attributes[name]);
             },
             /**
@@ -460,7 +469,7 @@
                 i = 0;
             for (key in this.rules) {
                 ruleList = this.rules[key];
-                validatable = isValidatable(ruleList);
+                validatable = isValidatable(ruleList,this.attributes,key);
                 while (i < ruleList.length) {
                     this._validateRule(key,ruleList[i],validatable);
                     i += 1;
