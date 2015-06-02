@@ -155,3 +155,194 @@ QUnit.test( "getError", function( assert ) {
     assert.ok( errors.length === 0, "errors.length === 0" );
 
 });
+
+
+QUnit.test( "required", function( assert ) {
+    var valid = zp.validator({}, {name : 'required'});
+    assert.ok( valid.passes() === false, "valid.passes() === false" );
+
+    valid = zp.validator({name : ''}, {name : 'required'});
+
+    assert.ok( valid.fails() === true, "valid.fails() === true" );
+
+    valid = zp.validator({name : 's'}, {name : 'required'});
+
+    assert.ok( valid.passes() === true, "valid.passes() === true" );
+});
+
+QUnit.test( "email", function( assert ) {
+    var valid = zp.validator({}, {email : 'email'});
+
+    assert.ok( valid.passes() === true, "valid.passes() === true" );
+
+    valid = zp.validator({email : 'ss'}, {email : 'required|email'});
+
+
+    assert.ok( valid.fails() === true, "valid2.fails() === true" );
+
+
+    valid = zp.validator({email : 'zotov_mv@groupbwt.com'}, {email : 'email'});
+
+    assert.ok( valid.passes() === true, "valid.passes() === true" );
+
+    valid = zp.validator({email : 'zotov_mv+1@groupbwt.com'}, {email : 'email'});
+
+    assert.ok( valid.passes() === true, "valid.passes() === true" );
+
+    valid = zp.validator({email : 'zotov_mv@'}, {email : 'email'});
+
+    assert.ok( valid.fails() === true, "valid.fails() === true" );
+
+    valid = zp.validator({email : 'zotov_mv@groupbwt'}, {email : 'email'});
+
+    assert.ok( valid.fails() === true, "valid.fails() === true" );
+
+    valid = zp.validator({email : 'zotov_mv@groupbwt.'}, {email : 'email'});
+
+    assert.ok( valid.fails() === true, "valid.fails() === true" );
+
+    valid = zp.validator({email : 'zotov_mv@groupbwt.c'}, {email : 'email'});
+
+    assert.ok( valid.passes() === true, "valid.passes() === true" );
+});
+
+QUnit.test( "alpha", function( assert ) {
+    var valid = zp.validator({}, {name : 'alpha'});
+
+    assert.ok( valid.passes() === true, "valid.passes() === true" );
+
+    valid = zp.validator({name: 's'}, {name : 'alpha'});
+
+    assert.ok( valid.passes() === true, "valid.passes() === true" );
+
+    valid = zp.validator({name:1}, {name : 'alpha'});
+
+    assert.ok( valid.fails() === true, "valid.fails() === true" );
+
+    valid = zp.validator({name: '1 maxim'}, {name : 'alpha'});
+
+    assert.ok( valid.fails() === true, "valid.fails() === true" );
+
+    valid = zp.validator({name: 'm maxim'}, {name : 'alpha'});
+
+    assert.ok( valid.fails() === true, "valid.fails() === true" );
+
+    valid = zp.validator({name: 'maxim'}, {name : 'alpha'});
+
+    assert.ok( valid.passes() === true, "valid.passes() === true" );
+
+});
+
+QUnit.test( "alphaNumeric", function( assert ) {
+
+    var valid = zp.validator({}, {name : 'alphaNumeric'});
+
+    assert.ok( valid.passes() === true, "valid.passes() === true" );
+
+    valid = zp.validator({name: 's 1'}, {name : 'alphaNumeric'});
+
+    assert.ok( valid.fails() === true, "valid.fails() === true" );
+
+    valid = zp.validator({name: 's1'}, {name : 'alphaNumeric'});
+
+    assert.ok( valid.passes() === true, "valid.passes() === true" );
+
+    valid = zp.validator({name: '1'}, {name : 'alphaNumeric'});
+
+    assert.ok( valid.passes() === true, "valid.passes() === true" );
+});
+
+QUnit.test( "alphaDash", function( assert ) {
+    var valid = zp.validator({}, {name : 'alphaDash'});
+
+    assert.ok( valid.passes() === true, "valid.passes() === true" );
+
+    valid = zp.validator({name: 's 1'}, {name : 'alphaDash'});
+
+    assert.ok( valid.fails() === true, "valid.fails() === true" );
+
+    valid = zp.validator({name: 's1'}, {name : 'alphaDash'});
+
+    assert.ok( valid.passes() === true, "valid.passes() === true" );
+
+    valid = zp.validator({name: '1'}, {name : 'alphaDash'});
+
+    assert.ok( valid.passes() === true, "valid.passes() === true" );
+
+    valid = zp.validator({name: 's-1'}, {name : 'alphaDash'});
+
+    assert.ok( valid.passes() === true, "valid.passes() === true" );
+});
+
+QUnit.test( "numeric", function( assert ) {
+    var valid = zp.validator({}, {name : 'numeric'});
+
+    assert.ok( valid.passes() === true, "valid.passes() === true" );
+
+    valid = zp.validator({name : '1'}, {name : 'numeric'});
+
+    assert.ok( valid.passes() === true, "valid.passes() === true" );
+
+    valid = zp.validator({name : 1}, {name : 'numeric'});
+
+    assert.ok( valid.passes() === true, "valid.passes() === true" );
+
+    valid = zp.validator({name : 'd1'}, {name : 'numeric'});
+
+    assert.ok( valid.fails() === true, "valid.fails() === true" );
+
+    valid = zp.validator({name : '1-1'}, {name : 'numeric'});
+
+    assert.ok( valid.fails() === true, "valid.fails() === true" );
+
+    valid = zp.validator({name : '1.1'}, {name : 'numeric'});
+
+    assert.ok( valid.passes() === true, "valid.passes() === true" );
+
+    valid = zp.validator({name : 1.124}, {name : 'numeric'});
+
+    assert.ok( valid.passes() === true, "valid.passes() === true" );
+
+});
+
+QUnit.test( "numericDash", function( assert ) {
+    var valid = zp.validator({}, {name : 'numericDash'});
+
+    assert.ok( valid.passes() === true, "valid.passes() === true" );
+
+    valid = zp.validator({name : '1'}, {name : 'numericDash'});
+
+    assert.ok( valid.passes() === true, "valid.passes() === true" );
+
+    valid = zp.validator({name : 1}, {name : 'numericDash'});
+
+    assert.ok( valid.passes() === true, "valid.passes() === true" );
+
+    valid = zp.validator({name : 'd1'}, {name : 'numericDash'});
+
+    assert.ok( valid.fails() === true, "valid.fails() === true" );
+
+    valid = zp.validator({name : '1-1'}, {name : 'numericDash'});
+
+    assert.ok( valid.passes() === true, "valid.fails() === true" );
+
+    valid = zp.validator({name : '1 1'}, {name : 'numericDash'});
+
+    assert.ok( valid.passes() === true, "valid.fails() === true" );
+});
+
+QUnit.test( "url", function( assert ) {
+    var valid = zp.validator({}, {name : 'url'});
+
+    assert.ok( valid.passes() === true, "valid.passes() === true" );
+
+    assert.ok( zp.validator({url: 'google.ua'}, {url : 'url'}).fails(), "zp.validator({url: 'google.ua'}, {url : 'url'}).fails()" );
+
+    assert.ok( zp.validator({url: 'http://google.ua'}, {url : 'url'}).passes(), "zp.validator({url: 'http://google.ua'}, {url : 'url'}).passes()" );
+    assert.ok( zp.validator({url: 'https://google.ua'}, {url : 'url'}).passes(), "zp.validator({url: 'https://google.ua'}, {url : 'url'}).passes()" );
+    assert.ok( zp.validator({url: 'htt://google.ua'}, {url : 'url'}).fails(), "zp.validator({url: 'htt://google.ua'}, {url : 'url'}).fails()" );
+    assert.ok( zp.validator({url: 'https://www.google.de/search?q=yii+framework&ie=utf-8&oe=utf-8&rls=org.mozilla:de:official&client=firefox-a&gws_rd=cr'}, {url : 'url'}).passes(), "zp.validator({url: 'https://www.google.de/search?q=yii+framework&ie=utf-8&oe=utf-8&rls=org.mozilla:de:official&client=firefox-a&gws_rd=cr'}, {url : 'url'}).passes()" );
+    assert.ok( zp.validator({url: 'ftp://ftp.ruhr-uni-bochum.de/'}, {url : 'url'}).fails(), "zp.validator({url: 'ftp://ftp.ruhr-uni-bochum.de/'}, {url : 'url'}).fails()" );
+    assert.ok( zp.validator({url: 'http://invalid,domain'}, {url : 'url'}).fails(), "zp.validator({url: 'http://invalid,domain'}, {url : 'url'}).fails()" );
+    assert.ok( zp.validator({url: 'http://äüö?=!"§$%&/()=}][{³²€.edu'}, {url : 'url'}).fails(), "zp.validator({url: 'http://äüö?=!$%&/()=}][{³²€.edu}, {url : 'url'}).fails()" );
+});
