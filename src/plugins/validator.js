@@ -298,7 +298,11 @@
              * @returns {boolean}
              */
             'in' : function validateIN (attributes,name,parameters) {
-                return zp.inArray(parameters,attributes[name]);
+                var value = attributes[name];
+                if(zp.isNumber(attributes[name])){
+                    value = String(attributes[name]);
+                }
+                return zp.inArray(parameters,value);
             },
             /**
              *
@@ -308,7 +312,7 @@
              * @returns {boolean}
              */
             notIn : function validateNotIN (attributes,name,parameters) {
-                return !zp.inArray(parameters,attributes[name]);
+                return !ruleMethods.in(attributes,name,parameters);
             },
             /**
              *
