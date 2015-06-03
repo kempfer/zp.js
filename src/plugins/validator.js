@@ -48,7 +48,7 @@
                 rule,
                 listRules = {};
 
-            for(key in rules) {
+            for (key in rules) {
                 if (rules.hasOwnProperty(key)) {
                     rule = rules[key];
                     if (zp.isString(rule)) {
@@ -71,10 +71,10 @@
                 parseRule,
                 i = 0,
                 listRules = [];
-            if(zp.isObject(rules)){
+            if (zp.isObject(rules)) {
                 return rules;
             }
-            else if(zp.isArray(rules)){
+            else if (zp.isArray(rules)) {
                 while (i < rules.length) {
                     rule = rules[i];
                     if(zp.isObject(rule)){
@@ -101,17 +101,17 @@
 
         /**
          *
-         * @param {string} rule
+         * @param {string} stringRule
          * @returns {Object}
          */
-        parseStringRule = function validatorParseRule (rule) {
+        parseStringRule = function validatorParseRule (stringRule) {
             var
-                rules = rule.split('|'),
+                rules = stringRule.split('|'),
                 i = 0,
                 l = rules.length,
                 listRules = [],
                 rule;
-            while(i < l){
+            while (i < l) {
                 rule = rules[i].split(':');
                 listRules.push({
                     name: rule[0],
@@ -128,7 +128,7 @@
          * @returns {Array}
          */
         parseParameters = function validatorParseParameters (values) {
-            if(zp.isString(values)){
+            if (zp.isString(values)) {
                 return values.split(",");
             }
             else{
@@ -162,12 +162,12 @@
             var
                 validatable = false,
                 i = rules.length;
-            if(zp.isUndefined(attributes[key])){
+            if (zp.isUndefined(attributes[key])) {
                 while (i) {
                     i -= 1;
-                    if(zp.inArray(implicitRules, rules[i].name)){
+                        if (zp.inArray(implicitRules, rules[i].name)) {
                         validatable = true;
-                        continue;
+                        break;
                     }
                 }
             }
@@ -299,7 +299,7 @@
              */
             'in' : function validateIN (attributes,name,parameters) {
                 var value = attributes[name];
-                if(zp.isNumber(attributes[name])){
+                if (zp.isNumber(attributes[name])) {
                     value = String(attributes[name]);
                 }
                 return zp.inArray(parameters,value);
@@ -414,7 +414,7 @@
 
         /**
          *
-         * @param {String} key
+         * @param {String} dataKey
          * @param {Object} rule
          * @param {boolean} validatable
          * @private
@@ -480,11 +480,13 @@
                 validatable,
                 i = 0;
             for (key in this.rules) {
-                ruleList = this.rules[key];
-                validatable = isValidatable(ruleList,this.attributes,key);
-                while (i < ruleList.length) {
-                    this._validateRule(key,ruleList[i],validatable);
-                    i += 1;
+                if (this.rules.hasOwnProperty(key)) {
+                    ruleList = this.rules[key];
+                    validatable = isValidatable(ruleList,this.attributes,key);
+                    while (i < ruleList.length) {
+                        this._validateRule(key,ruleList[i],validatable);
+                        i += 1;
+                    }
                 }
             }
             this.completed = true;
@@ -503,13 +505,15 @@
                 i = 0,
                 errors = [];
             for(key in this.result.errorKeys){
-                errorKeys = this.result.errorKeys[key];
-                error = { name: key,  message: []};
-                while ( i < errorKeys.length) {
-                    error.message.push(errorKeys[i].message);
-                    i += 1;
+                if (this.result.errorKeys.hasOwnProperty(key)) {
+                    errorKeys = this.result.errorKeys[key];
+                    error = { name: key,  message: []};
+                    while ( i < errorKeys.length) {
+                        error.message.push(errorKeys[i].message);
+                        i += 1;
+                    }
+                    errors.push(error);
                 }
-                errors.push(error);
             }
             return errors;
         },
