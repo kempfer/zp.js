@@ -346,3 +346,128 @@ QUnit.test( "url", function( assert ) {
     assert.ok( zp.validator({url: 'http://invalid,domain'}, {url : 'url'}).fails(), "zp.validator({url: 'http://invalid,domain'}, {url : 'url'}).fails()" );
     assert.ok( zp.validator({url: 'http://äüö?=!"§$%&/()=}][{³²€.edu'}, {url : 'url'}).fails(), "zp.validator({url: 'http://äüö?=!$%&/()=}][{³²€.edu}, {url : 'url'}).fails()" );
 });
+
+QUnit.test( "integer", function( assert ) {
+    var valid = zp.validator({}, {name : 'integer'});
+
+    assert.ok( valid.passes() === true, "valid.passes() === true" );
+
+    valid = zp.validator({name : '1'}, {name : 'integer'});
+
+    assert.ok( valid.passes() === true, "valid.passes() === true" );
+
+    valid = zp.validator({name : 1}, {name : 'integer'});
+
+    assert.ok( valid.passes() === true, "valid.passes() === true" );
+
+    valid = zp.validator({name : 'd1'}, {name : 'integer'});
+
+    assert.ok( valid.fails() === true, "valid.fails() === true" );
+
+    valid = zp.validator({name : '1-1'}, {name : 'integer'});
+
+    assert.ok( valid.fails() === true, "valid.fails() === true" );
+
+});
+
+QUnit.test( "in", function( assert ) {
+    var valid = zp.validator({}, {date : 'in:1,3,5'});
+
+    assert.ok( valid.passes() === true, "valid.passes() === true" );
+
+    valid = zp.validator({date: 1}, {date : 'in:1,3,5'});
+
+    assert.ok( valid.passes() === true, "valid.passes() === true" );
+
+    assert.ok( zp.validator({date:3}, {date : 'in:1,3,5'}).passes(), " zp.validator({date:3}, {date : 'in:1,3,5'}).passes()");
+
+    assert.ok( valid.passes() === true, "valid.passes() === true" );
+
+    valid = zp.validator({date: 2}, {date : 'in:1,3,5'});
+
+    assert.ok( valid.fails() === true, "valid.passes() === true" );
+});
+
+
+QUnit.test( "notIn", function( assert ) {
+    var valid = zp.validator({}, {date : 'notIn:1,3,5'});
+
+    assert.ok( valid.passes() === true, "valid.passes() === true" );
+
+    valid = zp.validator({date: 1}, {date : 'notIn:1,3,5'});
+
+    assert.ok( valid.fails() === true, "valid.fails() === true" );
+
+    assert.ok( zp.validator({date:3}, {date : 'notIn:1,3,5'}).fails(), " zp.validator({date:3}, {date : 'in:1,3,5'}).passes()");
+
+    assert.ok( valid.fails() === true, "valid.fails() === true" );
+
+    valid = zp.validator({date: 2}, {date : 'notIn:1,3,5'});
+
+    assert.ok( valid.passes() === true, "valid.passes() === true" );
+});
+
+
+QUnit.test( "confirmed", function( assert ) {
+    var valid = zp.validator({}, {password_confirm : 'confirmed:password'});
+
+    assert.ok( valid.passes() === true, "valid.passes() === true" );
+
+    assert.ok(zp.validator({password:5456, password_confirm:5456}, {password_confirm : 'confirmed:password'}).passes(), "zp.validator({password:5456, password_confirm:5456}, {password_confirm : 'confirmed:password'}).passes()");
+
+    assert.ok(zp.validator({password:'5456', password_confirm:5456}, {password_confirm : 'confirmed:password'}).passes(), "zp.validator({password:5456, password_confirm:5456}, {password_confirm : 'confirmed:password'}).passes()");
+
+    assert.ok(zp.validator({password:545, password_confirm:5456}, {password_confirm : 'confirmed:password'}).fails(), "zp.validator({password:'545', password_confirm:5456}, {password_confirm : 'confirmed:password'}).fails()");
+    assert.ok(zp.validator({password_confirm:5456}, {password_confirm : 'confirmed:password'}).fails(), "zp.validator({password:'545', password_confirm:5456}, {password_confirm : 'confirmed:password'}).fails()");
+
+});
+
+QUnit.test( "max", function( assert ) {
+
+    var valid = zp.validator({}, {name : 'max:5'});
+
+    assert.ok( valid.passes() === true, "valid.passes() === true" );
+
+    assert.ok(zp.validator({name:"maxim"}, {name : 'max:5'}).passes(), "zp.validator({name:'maxim'}, {name : 'max:5'}).passes()");
+
+    assert.ok(zp.validator({name:"maxim"}, {name : 'max:4'}).fails(), "zp.validator({name:'maxim'}, {name : 'max:4'}).fails()");
+
+    assert.ok(zp.validator({name:10}, {name : 'max:7'}).fails(), "zp.validator({name:10}, {name : 7}).fails()");
+
+    assert.ok(zp.validator({name:7}, {name : 'max:7'}).passes(), "zp.validator({name:7}, {name : 'max:7'}).passes()");
+
+    assert.ok(zp.validator({name:6}, {name : 'max:7'}).passes(), "zp.validator({name:7}, {name : 'max:7'}).passes()");
+});
+
+QUnit.test( "min", function( assert ) {
+
+    var valid = zp.validator({}, {name : 'min:5'});
+
+    assert.ok( valid.passes() === true, "valid.passes() === true" );
+
+    assert.ok(zp.validator({name:"maxim"}, {name : 'min:5'}).passes(), "zp.validator({name:'maxim'}, {name : 'min:5'}).passes()");
+
+    assert.ok(zp.validator({name:"max"}, {name : 'min:5'}).fails(), "zp.validator({name:'max'}, {name : 'min:5'}).fails()");
+
+    assert.ok(zp.validator({name:3}, {name : 'min:5'}).fails(), "zp.validator({name:3}, {name : 'min:5'}).fails()");
+
+    assert.ok(zp.validator({name:6}, {name : 'min:5'}).passes(), "zp.validator({name:6}, {name : 'min:5'}).fails()");
+
+});
+
+QUnit.test( "between", function( assert ) {
+
+    var valid = zp.validator({}, {name : 'between:5,6'});
+
+    assert.ok( valid.passes() === true, "valid.passes() === true" );
+
+    assert.ok(zp.validator({name:"maxim"}, {name : 'between:5,6'}).passes(), "zp.validator({name:'maxim'}, {name : 'between:5,6'}).passes()");
+
+    assert.ok(zp.validator({name:"max"}, {name : 'between:5,7'}).fails(), "zp.validator({name:'max''}, {name : 'between:5,7'}).fails()");
+
+    assert.ok(zp.validator({name:3}, {name : 'between:5,7'}).fails(), "zp.validator({name:3}, {name : 'between:5,7'}).fails()");
+
+    assert.ok(zp.validator({name:6}, {name : 'min:5,7'}).passes(), "zp.validator({name:6}, {name : 'min:5,7'}).passes()");
+
+});
+//
