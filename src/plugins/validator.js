@@ -29,12 +29,12 @@
             alpha: '{attribute} must be an alpha.',
             alphaNumeric: '{attribute} must be an alphaNumeric.',
             numeric: '{attribute} must be an numeric.',
-            confirmed: '{attribute} must be repeated exactly',
-            'in': '{attribute} is invalid',
-            notIn: '{attribute} is invalid',
+            confirmed: '{attribute} must be repeated exactly.',
+            'in': '{attribute} is invalid.',
+            notIn: '{attribute} is invalid.',
             min: function (name, rule, params) {
                 var
-                    msg = '{attribute} must be no less than {min}';
+                    msg = '{attribute} must be no less than {min}.';
                 msg = msg.replace('{attribute}', name);
                 msg = msg.replace('{min}', params[0]);
                 return msg;
@@ -217,7 +217,7 @@
          */
         getSize = function getSize (v) {
             var size;
-            if (zp.isNumber(v)) {
+            if (zp.isNumber(Number(v))) {
                 size = v;
             }
             else if (zp.isArray(v) || zp.isString(v)) {

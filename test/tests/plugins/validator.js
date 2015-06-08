@@ -470,4 +470,82 @@ QUnit.test( "between", function( assert ) {
     assert.ok(zp.validator({name:6}, {name : 'min:5,7'}).passes(), "zp.validator({name:6}, {name : 'min:5,7'}).passes()");
 
 });
+
+QUnit.test( "Message", function( assert ) {
+
+    var valid =  zp.validator({email : 'aaaa'}, {email : 'email'});
+    valid.validated();
+
+    assert.ok( valid.getError('email')[0] === "email is not a valid email address.", "{attribute} is not a valid email address." );
+
+    var valid =  zp.validator({email : ''}, {email : 'required'});
+    valid.validated();
+
+    assert.ok( valid.getError('email')[0] === "email cannot be blank.", "{attribute} cannot be blank." );
+
+    var valid =  zp.validator({url : ''}, {url : 'url'});
+    valid.validated();
+
+    assert.ok( valid.getError('url')[0] === "url is not a valid URL.", "{attribute} is not a valid URL." );
+
+    var valid =  zp.validator({ip : ''}, {ip : 'ip'});
+    valid.validated();
+
+    assert.ok( valid.getError('ip')[0] === "ip is not a valid ip.", "{attribute} is not a valid ip." );
+
+    var valid =  zp.validator({number : 'ss'}, {number : 'integer'});
+    valid.validated();
+
+    assert.ok( valid.getError('number')[0] === "number must be an integer.", "{attribute} must be an integer." );
+
+    var valid =  zp.validator({alpha : '22'}, {alpha : 'alpha'});
+    valid.validated();
+
+    assert.ok( valid.getError('alpha')[0] === "alpha must be an alpha.", "{attribute} must be an alpha." );
+
+    var valid =  zp.validator({alphaNumeric : 's 1'}, {alphaNumeric : 'alphaNumeric'});
+    valid.validated();
+
+    assert.ok( valid.getError('alphaNumeric')[0] === "alphaNumeric must be an alphaNumeric.", "{attribute} must be an alphaNumeric." );
+
+    var valid =  zp.validator({numeric : 's 1'}, {numeric : 'numeric'});
+    valid.validated();
+
+    assert.ok( valid.getError('numeric')[0] === "numeric must be an numeric.", "{attribute} must be an numeric." );
+
+    var valid =  zp.validator({numeric : 's 1', test : 's'}, {numeric : 'confirmed:test'});
+    valid.validated();
+
+    assert.ok( valid.getError('numeric')[0] === "numeric must be repeated exactly.", "{attribute} must be repeated exactly." );
+
+    var valid =  zp.validator({numeric : '1'}, {numeric : 'in:2,5'});
+    valid.validated();
+
+    assert.ok( valid.getError('numeric')[0] === "numeric is invalid.", "{attribute} is invalid." );
+
+    var valid =  zp.validator({numeric : '1'}, {numeric : 'notIn:1,5'});
+    valid.validated();
+
+    assert.ok( valid.getError('numeric')[0] === "numeric is invalid.", "{attribute} is invalid." );
+
+
+    var valid =  zp.validator({numeric : '1'}, {numeric : 'min:5'});
+    valid.validated();
+
+    assert.ok( valid.getError('numeric')[0] === "numeric must be no less than 5.", "{attribute} must be no less than {min}." );
+
+    var valid =  zp.validator({numeric : '6'}, {numeric : 'max:5'});
+    valid.validated();
+
+
+    assert.ok( valid.getError('numeric')[0] === "numeric must be no greater than 5.", "{attribute} must be no greater than {max}." );
+
+    var valid =  zp.validator({numeric : '6'}, {numeric : 'between:4,5'});
+    valid.validated();
+
+
+    assert.ok( valid.getError('numeric')[0] === "numeric must be between 4 and 5.", "{attribute} must be between {min} and {max}." );
+
+
+});
 //
