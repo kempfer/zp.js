@@ -28,7 +28,32 @@
             integer: '{attribute} must be an integer.',
             alpha: '{attribute} must be an alpha.',
             alphaNumeric: '{attribute} must be an alphaNumeric.',
-            numeric: '{attribute} must be an numeric.'
+            numeric: '{attribute} must be an numeric.',
+            confirmed: '{attribute} must be repeated exactly',
+            'in': '{attribute} is invalid',
+            notIn: '{attribute} is invalid',
+            min: function (name, rule, params) {
+                var
+                    msg = '{attribute} must be no less than {min}';
+                msg = msg.replace('{attribute}', name);
+                msg = msg.replace('{min}', params[0]);
+                return msg;
+            },
+            max: function (name, rule, params) {
+                var
+                    msg = '{attribute} must be no greater than {max}.';
+                msg = msg.replace('{attribute}', name);
+                msg = msg.replace('{max}', params[0]);
+                return msg;
+            },
+            between: function (name, rule, params) {
+                var
+                    msg = '{attribute} must be between {min} and {max}.';
+                msg = msg.replace('{attribute}', name);
+                msg = msg.replace('{min}', params[0]);
+                msg = msg.replace('{max}', params[1]);
+                return msg;
+            }
         },
 
         /**
@@ -145,9 +170,16 @@
          */
         prepareMessage = function validatorPrepareMessage (name, rule, params) {
             var
-                message = messageList[rule] || '';
-            message = message.replace('{attribute}', name);
-            return message;
+                prepareMessage,
+                message = messageList[rule] || '{attribute} is invalid';
+            if (zp.isFunction(message)) {
+                prepareMessage = message(name, rule, params);
+            }
+            else {
+                prepareMessage = message.replace('{attribute}', name);
+            }
+
+            return prepareMessage;
 
         },
 
@@ -381,7 +413,7 @@
             this.rules = explodeRules(rules);
             this.attributes = data;
             this.result = {passed: true, errorKeys : {},  countError: 0};
-            this.messages = messages;
+            this.messages = messages || {};
             this.completed = false;
             return this;
         };
@@ -438,12 +470,13 @@
          * @private
          */
         _addError : function (dataKey, ruleName, parameters) {
+            var msg = this.messages[dataKey] || prepareMessage(dataKey,ruleName,parameters);
             if (zp.isUndefined(this.result.errorKeys[dataKey])) {
                 this.result.errorKeys[dataKey] = [];
             }
             this.result.errorKeys[dataKey].push({
                 rule: ruleName,
-                message: prepareMessage(dataKey,ruleName,parameters)
+                message: msg
             });
             this.result.passed = false;
             this.result.countError += 1;
