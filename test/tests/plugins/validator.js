@@ -546,6 +546,16 @@ QUnit.test( "Message", function( assert ) {
 
     assert.ok( valid.getError('numeric')[0] === "numeric must be between 4 and 5.", "{attribute} must be between {min} and {max}." );
 
+});
+
+QUnit.test( "Custom Message", function( assert ) {
+
+    var valid =  zp.validator({numeric : '6'}, {numeric : 'between:4,5'}, {numeric : 'Custom Message'});
+    valid.validated();
+
+    console.log(valid.getError('numeric')[0]);
+    assert.ok( valid.getError('numeric')[0] === "Custom Message", "Custom Message" );
+
 
 });
 //
