@@ -407,7 +407,7 @@
         Validator = function ValidatorConstructor (data, rules, messages) {
 
             if (!(this instanceof Validator)) {
-                return new Validator(data, rules);
+                return new Validator(data, rules, messages);
             }
 
             this.rules = explodeRules(rules);
