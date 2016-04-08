@@ -1,0 +1,238 @@
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Zp lib</title>
+		<script type="text/javascript"  src="src/core/zp.js"></script>
+		<script type="text/javascript"  src="src/plugins/dom.js"></script>
+		<script type="text/javascript"  src="src/plugins/animation.js"></script>
+	</head>
+	<style>
+		#container {			
+			margin-top:50px;
+			margin-left: 50px;
+			margin-right: 50px;
+			height:200px;
+			border: 1px solid #008000;
+		}
+
+		#canvas {
+			height:200px;
+			margin-left: 50px;
+		}
+		#container-comparison {
+			margin-top:50px;
+			margin-left: 50px;
+			margin-right: 50px;
+			height:200px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			overflow: auto;
+		}
+		#container-comparison .box {
+			float: left;
+			width: 150px;
+			height: 150px;
+			border: 1px solid #008000;
+			margin-left: 50px;
+			margin-right: 50px;
+		}
+
+		#container .box-el {
+			float: left;
+			height: 100%;
+			border: 1px solid #008000;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			overflow: auto;
+		}
+
+		.el {
+			border: 1px solid;
+			text-align: center;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			background-color: #109CEC;
+			color: #FFFFFF;
+			font-size: 25px;
+			font-weight: bold;
+		}
+	</style>
+	<body>
+		<button id="array-mix">Array mix</button>
+		<button id="sort-star">Sort star</button>
+		<div id="container"></div>
+		<canvas id="canvas"></canvas>
+		<div id="container-comparison">
+			<div class="box" position = "0"></div>
+			<div class="box" position = "1"></div>
+		</div>
+		<script>
+		
+			
+			
+			;(function () {
+
+				'use strict';
+
+				zp.dom.onReady(function () {
+					var array = [0,1,2,3,4,5,6,7,8,9];
+
+					renderContainer(array);
+
+					zp.dom('#array-mix').on('click', function () {
+						var newArray = arrayShuffle(array);
+						renderContainer(newArray);
+					});
+
+					zp.dom('#sort-star').on('click', function () {
+						var newArray = bubbleSort(array);
+						//renderContainer(newArray);
+					});
+
+
+				});
+
+				function renderContainer(array) {
+					zp.dom('#container').empty();
+					var
+						count  = array.length,
+						widthEl =  calculateElementWidth(count);
+					zp.dom('#container').css('height', widthEl);
+					zp.dom('#canvas').css('width', zp.dom('#container').size.width);
+					array.forEach(function (el, index) {
+						renderElement(el, index, widthEl);
+					});
+
+				}
+
+				function renderElement(el, index, widthEl) {
+					var boxEl, node, width;
+
+					boxEl = zp.dom.create('div')
+							.css('width', widthEl)
+							.addClass('box-el');
+
+					node = zp.dom.create('div', {'class' : 'el' , 'first-position' : index});
+					node.text(el);
+					width =  widthEl / 2;
+					node.css('width', width).css('height', width).css('border-radius', width / 2);
+					boxEl.append(node);
+					zp.dom('#container').append(boxEl);
+
+
+				}
+
+
+
+				/**
+				 *
+				 * @param Array array
+                 * @returns Array
+                 */
+				function bubbleSort(array) {
+					var j, len, i, c, sleep = 5000, test;
+					len = array.length - 1;
+					test = sleep;
+					for (j = 0; j < len; j++) {
+						i = 0;
+						while (i < len) {
+
+
+							if (array[i] > array[i + 1]) {
+								setTimeout((function () {
+									var index = i;
+									var newIndex = i+1;
+									return function () {
+										setTimeout(function () {
+											console.log(index);
+											console.log("назада");
+											moveElement(zp.dom('div[first-position-demo="' + index + '"]'), zp.dom('div[first-position="' + index + '"]').offset.x, zp.dom('div[first-position="' + index + '"]').offset.y);
+											moveElement(zp.dom('div[first-position-demo="' + newIndex + '"]'), zp.dom('div[first-position="' + newIndex + '"]').offset.x, zp.dom('div[first-position="' + newIndex + '"]').offset.y);
+										},2500);
+										moveElementToBoxComparison(zp.dom('div[first-position="' + index + '"]'), 0);
+										moveElementToBoxComparison(zp.dom('div[first-position="' + newIndex + '"]'), 1);
+									};
+
+								}()), test);
+								c = array[i];
+								array[i] = array[i + 1];
+								array[i + 1] = c;
+							} else {
+								setTimeout((function () {
+									var index = i;
+									var newIndex = i+1;
+									return function () {
+										setTimeout(function () {
+											console.log(index);
+											console.log("назада");
+											moveElement(zp.dom('div[first-position-demo="' + index + '"]'), zp.dom('div[first-position="' + index + '"]').offset.x, zp.dom('div[first-position="' + index + '"]').offset.y);
+											moveElement(zp.dom('div[first-position-demo="' + newIndex + '"]'), zp.dom('div[first-position="' + newIndex + '"]').offset.x, zp.dom('div[first-position="' + newIndex + '"]').offset.y);
+										},2500);
+										moveElementToBoxComparison(zp.dom('div[first-position="' + index + '"]'), 0);
+										moveElementToBoxComparison(zp.dom('div[first-position="' + newIndex + '"]'), 1);
+									};
+
+								}()), test);
+
+							}
+							test = test + sleep;
+							i++;
+						}
+					}
+					return array;
+				}
+
+				function calculateElementWidth(countEl) {
+
+					var containerWidth = zp.dom('#container').size.width - 2;
+					return (containerWidth  / countEl ) - 2;
+				}
+
+				function arrayShuffle (el) {
+					var currentIndex = el.length,
+							temporaryValue, randomIndex;
+					while(0 !== currentIndex) {
+						randomIndex = Math.floor(Math.random() * currentIndex);
+						currentIndex -= 1;
+						temporaryValue = el[currentIndex];
+						el[currentIndex] = el[randomIndex];
+						el[randomIndex] = temporaryValue;
+					}
+					return el;
+				}
+
+				function moveElementToBoxComparison(el, boxIndex)
+				{
+					var cloneElement = zp.dom(el).clone();
+					cloneElement.css('position', 'absolute')
+							.css('top', zp.dom(el).offset.y)
+							.css('left', zp.dom(el).offset.x);
+					cloneElement.attr('first-position-demo', cloneElement.attr('first-position'));
+					cloneElement.removeAttr('first-position');
+
+					zp.dom(el).css('display', 'none');
+					zp.dom('body').append(cloneElement);
+					var left = parseInt(zp.dom('div[position="'+boxIndex+'"]').offset.x) + (parseInt(zp.dom('div[position="'+boxIndex+'"]').size.width)/4 - 4);
+					var top = zp.dom('div[position="'+boxIndex+'"]').offset.y + (zp.dom('div[position="'+boxIndex+'"]').size.height/4 - 4);
+					moveElement(cloneElement, left, top);
+				}
+
+				function moveElement(el, left, top)
+				{
+					el.animation({
+						top: top,
+						left: left
+					});
+				}
+
+
+
+			})(zp);
+			
+			
+		</script>
+	</body>
+</html>
