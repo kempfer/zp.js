@@ -6,6 +6,7 @@
     <script type="text/javascript"  src="src/core/zp.js"></script>
     <script type="text/javascript"  src="src/plugins/ajax.js"></script>
     <script type="text/javascript"  src="src/plugins/dom.js"></script>
+    <script type="text/javascript"  src="mently-snippet.min.js"></script>
 
 
 <body>
@@ -39,6 +40,20 @@
             console.log(e);
             console.log(this.value);
         });
+
+        var  formData = new FormData();
+        formData.append("app_key", "NQOTfH7JkrtAwUdQsWL9");
+        formData.append("app_secret", "ebb0892116e4da50c87fa9d115018614");
+        formData.append("distinct_id", "14");
+      //  formData.append("properties[_gender]", "male");
+       formData.append("properties[_country]", "United States");
+      //  formData.append("properties[_region]", "Minnesota");
+      //  formData.append("properties[_continent]", "NA");
+        //formData.append("properties[_timezone]", "America/New_York");
+        formData.append("properties[_city]", "Nevada");
+        //formData.append("properties[_avatar]", "http://zotov-mv.groupbwt.com/mently/eugene-yushenko.jpg");
+       // formData.append("properties[_birthday]", "02/05/1969");
+       
     });
 </script>
 </body>
