@@ -133,55 +133,19 @@
                  * @returns Array
                  */
 				function bubbleSort(array) {
-					var j, len, i, c, sleep = 5000, test;
+					var j,  i, c, len;
 					len = array.length - 1;
-					test = sleep;
 					for (j = 0; j < len; j++) {
-						i = 0;
-						while (i < len) {
-
-
-							if (array[i] > array[i + 1]) {
-								setTimeout((function () {
-									var index = i;
-									var newIndex = i+1;
-									return function () {
-										setTimeout(function () {
-											console.log(index);
-											console.log("назада");
-											moveElement(zp.dom('div[first-position-demo="' + index + '"]'), zp.dom('div[first-position="' + index + '"]').offset.x, zp.dom('div[first-position="' + index + '"]').offset.y);
-											moveElement(zp.dom('div[first-position-demo="' + newIndex + '"]'), zp.dom('div[first-position="' + newIndex + '"]').offset.x, zp.dom('div[first-position="' + newIndex + '"]').offset.y);
-										},2500);
-										moveElementToBoxComparison(zp.dom('div[first-position="' + index + '"]'), 0);
-										moveElementToBoxComparison(zp.dom('div[first-position="' + newIndex + '"]'), 1);
-									};
-
-								}()), test);
-								c = array[i];
-								array[i] = array[i + 1];
-								array[i + 1] = c;
-							} else {
-								setTimeout((function () {
-									var index = i;
-									var newIndex = i+1;
-									return function () {
-										setTimeout(function () {
-											console.log(index);
-											console.log("назада");
-											moveElement(zp.dom('div[first-position-demo="' + index + '"]'), zp.dom('div[first-position="' + index + '"]').offset.x, zp.dom('div[first-position="' + index + '"]').offset.y);
-											moveElement(zp.dom('div[first-position-demo="' + newIndex + '"]'), zp.dom('div[first-position="' + newIndex + '"]').offset.x, zp.dom('div[first-position="' + newIndex + '"]').offset.y);
-										},2500);
-										moveElementToBoxComparison(zp.dom('div[first-position="' + index + '"]'), 0);
-										moveElementToBoxComparison(zp.dom('div[first-position="' + newIndex + '"]'), 1);
-									};
-
-								}()), test);
-
+						for(i = 0; i < len; ++i){
+							console.log(array[i] + " " + array[i + 1]);
+							if (array[i] > array[i + 1] ) {
+								c = array[i + 1];
+								array[i + 1] = array[i];
+								array[i] = c;
 							}
-							test = test + sleep;
-							i++;
 						}
 					}
+
 					return array;
 				}
 
